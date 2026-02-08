@@ -45,6 +45,7 @@ export default function ManageKidsPage() {
   const [courseName, setCourseName] = useState('');
   const [totalLessons, setTotalLessons] = useState('180');
   const [currentLesson, setCurrentLesson] = useState('1');
+  const [courseStartDate, setCourseStartDate] = useState('');
   const [activeDays, setActiveDays] = useState(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
 
   const [portfolioTitle, setPortfolioTitle] = useState('');
@@ -205,6 +206,7 @@ export default function ManageKidsPage() {
       setCourseName(course.name);
       setTotalLessons(course.total_lessons.toString());
       setCurrentLesson(course.current_lesson.toString());
+      setCourseStartDate(course.start_date ? new Date(course.start_date).toISOString().split('T')[0] : '');
       
       if (typeof course.active_days === 'string') {
         const cleaned = course.active_days.trim();
@@ -227,6 +229,7 @@ export default function ManageKidsPage() {
       setCourseName('');
       setTotalLessons('180');
       setCurrentLesson('1');
+      setCourseStartDate(new Date().toISOString().split('T')[0]);
       setActiveDays(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
     }
     setIsCourseModalOpen(true);
@@ -277,6 +280,7 @@ export default function ManageKidsPage() {
         name: courseName,
         total_lessons: parseInt(totalLessons),
         current_lesson: parseInt(currentLesson),
+        start_date: courseStartDate ? new Date(courseStartDate).toISOString() : undefined,
         active_days: activeDays.join(',')
       };
 
@@ -549,10 +553,11 @@ export default function ManageKidsPage() {
       <Modal isOpen={isCourseModalOpen} onClose={() => setIsCourseModalOpen(false)} title={editingCourse ? 'Edit Course' : 'Track a New Course'} subtitle="Set up a course to track progress.">
         <form onSubmit={handleSaveCourse} className="space-y-4">
           <Input placeholder="Course Name" value={courseName} onChange={(e) => setCourseName(e.target.value)} required />
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Input type="number" label="Total Lessons" value={totalLessons} onChange={(e) => setTotalLessons(e.target.value)} required />
             <Input type="number" label="Current Lesson" value={currentLesson} onChange={(e) => setCurrentLesson(e.target.value)} required />
           </div>
+          <Input type="date" label="Course Start Date" value={courseStartDate} onChange={(e) => setCourseStartDate(e.target.value)} />
           <div className="mt-6">
             <p className="text-sm font-bold text-primary mb-3">Active Days</p>
             <div className="flex flex-wrap gap-2">

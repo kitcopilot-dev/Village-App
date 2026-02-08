@@ -36,6 +36,7 @@ export interface Course {
   name: string;
   total_lessons: number;
   current_lesson: number;
+  start_date?: string;
   active_days?: string; // Comma-separated or JSON
   last_lesson_date?: string; // YYYY-MM-DD
   created: string;
