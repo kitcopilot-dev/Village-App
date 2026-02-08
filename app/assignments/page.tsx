@@ -155,25 +155,25 @@ export default function AssignmentsPage() {
   return (
     <>
       <Header showLogout onLogout={() => { pb.authStore.clear(); router.push('/'); }} />
-      <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-12">
+      <main className="max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-8 pb-20 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8 sm:mb-12">
           <div>
-            <h2 className="font-display text-5xl font-extrabold tracking-tight mb-2">Assignments</h2>
-            <p className="text-text-muted">Track work items, quizzes, and projects.</p>
+            <h2 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight mb-2">Assignments</h2>
+            <p className="text-text-muted text-sm sm:text-base">Track work items, quizzes, and projects.</p>
           </div>
-          <div className="flex gap-4">
-            <Button variant="ghost" onClick={() => router.push('/dashboard')}>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Button variant="ghost" size="sm" onClick={() => router.push('/dashboard')} className="flex-1 sm:flex-none">
               📊 Dashboard
             </Button>
-            <Button onClick={() => setIsModalOpen(true)}>
+            <Button size="sm" onClick={() => setIsModalOpen(true)} className="flex-1 sm:flex-none">
               + New Assignment
             </Button>
           </div>
         </div>
 
         {/* Filters */}
-        <Card className="mb-8 p-6 md:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+        <Card className="mb-8 p-4 sm:p-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-end">
             <Select 
               label="Filter by Child" 
               value={filterChild} 
@@ -199,32 +199,32 @@ export default function AssignmentsPage() {
           {filteredAssignments.map((a) => {
             const kid = kids.find(k => k.id === a.child);
             return (
-              <div key={a.id} className="bg-card border border-border rounded-[1.5rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all hover:border-primary/30">
+              <div key={a.id} className="bg-card border border-border rounded-[1.5rem] p-5 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 transition-all hover:border-primary/30">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="m-0 font-display text-xl font-bold">{a.title}</h3>
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                    <h3 className="m-0 font-display text-lg sm:text-xl font-bold">{a.title}</h3>
                     {getStatusBadge(a.status)}
                   </div>
-                  <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-muted">
+                  <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm text-text-muted">
                     <span className="font-bold text-primary">🧒 {kid?.name || 'Unknown'}</span>
                     <span>📚 {a.subject || 'General'}</span>
-                    <span>📅 Due: {new Date(a.due_date).toLocaleDateString()}</span>
+                    <span>📅 {new Date(a.due_date).toLocaleDateString()}</span>
                   </div>
-                  {a.description && <p className="mt-4 text-sm text-text-muted line-clamp-2">{a.description}</p>}
+                  {a.description && <p className="mt-3 text-xs sm:text-sm text-text-muted line-clamp-2">{a.description}</p>}
                 </div>
                 
-                <div className="flex items-center gap-4 min-w-[200px] justify-end">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-full md:min-w-[200px] justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-border/50">
                   {a.status === 'Graded' ? (
-                    <div className="text-right">
-                      <div className="text-3xl font-display font-extrabold text-primary">{a.score}%</div>
-                      <div className="text-xs font-bold text-text-muted uppercase tracking-wider">Score</div>
+                    <div className="text-left md:text-right">
+                      <div className="text-2xl sm:text-3xl font-display font-extrabold text-primary">{a.score}%</div>
+                      <div className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Score</div>
                     </div>
                   ) : (
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-2 items-center flex-1 md:flex-none">
                       <Input 
                         placeholder="Score %" 
                         type="number" 
-                        className="w-24 mb-0" 
+                        className="w-full md:w-24 mb-0" 
                         onBlur={(e) => {
                           if (e.target.value) handleUpdateScore(a.id, e.target.value);
                         }}
@@ -237,7 +237,7 @@ export default function AssignmentsPage() {
                       await pb.collection('assignments').delete(a.id);
                       loadData();
                     }
-                  }}>
+                  }} className="px-3">
                     🗑️
                   </Button>
                 </div>
