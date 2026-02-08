@@ -16,7 +16,9 @@ export default function EventsPage() {
   
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAge, setFilterAge] = useState('');
 
@@ -28,6 +30,9 @@ export default function EventsPage() {
   const [location, setLocation] = useState('');
   const [ageSuitability, setAgeSuitability] = useState('All Ages');
   const [maxCapacity, setMaxCapacity] = useState('');
+  const [supplies, setSupplies] = useState('');
+
+  const currentUserId = pb.authStore.model?.id;
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
@@ -78,29 +83,67 @@ export default function EventsPage() {
     router.push('/');
   };
 
-  const handleCreateEvent = async (e: React.FormEvent) => {
+  const openCreateModal = () => {
+    setIsEditing(false);
+    setEditingId(null);
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (event: Event) => {
+    setIsEditing(true);
+    setEditingId(event.id);
+    setTitle(event.title);
+    setDescription(event.description);
+    setDate(new Date(event.date).toISOString().split('T')[0]);
+    setTime(event.time);
+    setLocation(event.location);
+    setAgeSuitability(event.age_suitability || 'All Ages');
+    setMaxCapacity(event.max_capacity?.toString() || '');
+    setSupplies(event.supplies || '');
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this gathering?')) return;
+    try {
+      await pb.collection('events').delete(id);
+      loadEvents();
+    } catch (error) {
+      console.error('Delete event error:', error);
+    }
+  };
+
+  const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
 
-      await pb.collection('events').create({
+      const data = {
         user: userId,
         title,
         description,
-        date,
+        date: new Date(date).toISOString(),
         time,
         location,
         age_suitability: ageSuitability,
-        max_capacity: maxCapacity ? parseInt(maxCapacity) : undefined
-      });
+        max_capacity: maxCapacity ? parseInt(maxCapacity) : undefined,
+        supplies: supplies || undefined
+      };
 
-      setIsCreateModalOpen(false);
+      if (isEditing && editingId) {
+        await pb.collection('events').update(editingId, data);
+      } else {
+        await pb.collection('events').create(data);
+      }
+
+      setIsModalOpen(false);
       resetForm();
       loadEvents();
     } catch (error) {
-      console.error('Create event error:', error);
+      console.error('Save event error:', error);
     }
   };
 
@@ -112,6 +155,7 @@ export default function EventsPage() {
     setLocation('');
     setAgeSuitability('All Ages');
     setMaxCapacity('');
+    setSupplies('');
   };
 
   const formatDate = (dateStr: string) => {
@@ -130,7 +174,7 @@ export default function EventsPage() {
           <h2 className="font-display text-5xl font-extrabold tracking-tight mb-0">Community Gatherings</h2>
           <div className="flex gap-4">
             <Button variant="ghost" onClick={() => router.push('/profile')}>← Back</Button>
-            <Button onClick={() => setIsCreateModalOpen(true)}>+ New Gathering</Button>
+            <Button onClick={openCreateModal}>+ New Gathering</Button>
           </div>
         </div>
 
@@ -176,12 +220,20 @@ export default function EventsPage() {
             <Card 
               key={event.id} 
               hoverable
-              className="animate-fade-in"
+              className="animate-fade-in group relative"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <h3 className="font-display text-2xl font-bold text-text mt-0 mb-3 leading-tight">
-                {event.title}
-              </h3>
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-display text-2xl font-bold text-text m-0 leading-tight">
+                  {event.title}
+                </h3>
+                {event.user === currentUserId && (
+                  <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => openEditModal(event)} className="text-text-muted hover:text-primary transition-colors">✏️</button>
+                    <button onClick={() => handleDeleteEvent(event.id)} className="text-text-muted hover:text-red-500 transition-colors">🗑️</button>
+                  </div>
+                )}
+              </div>
               <p className="font-serif italic text-secondary font-semibold mb-4">
                 {formatDate(event.date)} at {event.time}
               </p>
@@ -190,6 +242,7 @@ export default function EventsPage() {
                 <p>📍 {event.location}</p>
                 <p>👥 {event.age_suitability}</p>
                 {event.max_capacity && <p>🎟️ Max {event.max_capacity} participants</p>}
+                {event.supplies && <p className="mt-2 pt-2 border-t border-border/50 italic text-xs">🎒 {event.supplies}</p>}
               </div>
             </Card>
           ))}
@@ -202,28 +255,30 @@ export default function EventsPage() {
         )}
       </main>
 
-      {/* Create Event Modal */}
+      {/* Event Modal */}
       <Modal
-        isOpen={isCreateModalOpen}
+        isOpen={isModalOpen}
         onClose={() => {
-          setIsCreateModalOpen(false);
+          setIsModalOpen(false);
           resetForm();
         }}
-        title="Plan a Gathering"
-        subtitle="Create an event for your homeschool community."
+        title={isEditing ? "Edit Gathering" : "Plan a Gathering"}
+        subtitle={isEditing ? "Update the details for this event." : "Create an event for your homeschool community."}
       >
-        <form onSubmit={handleCreateEvent}>
+        <form onSubmit={handleSaveEvent}>
           <Input
             placeholder="Event Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            label="Title"
           />
           <Textarea
             placeholder="What's the plan?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            label="Description"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Input
@@ -231,12 +286,14 @@ export default function EventsPage() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
+              label="Date"
             />
             <Input
               placeholder="Time (e.g., 10:00 AM)"
               value={time}
               onChange={(e) => setTime(e.target.value)}
               required
+              label="Time"
             />
           </div>
           <Input
@@ -244,9 +301,10 @@ export default function EventsPage() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
+            label="Location"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <Select value={ageSuitability} onChange={(e) => setAgeSuitability(e.target.value)}>
+            <Select value={ageSuitability} onChange={(e) => setAgeSuitability(e.target.value)} label="Age Group">
               <option>All Ages</option>
               <option value="0-5">0-5 (Preschool)</option>
               <option value="6-10">6-10 (Elementary)</option>
@@ -258,21 +316,30 @@ export default function EventsPage() {
               placeholder="Max Capacity (optional)"
               value={maxCapacity}
               onChange={(e) => setMaxCapacity(e.target.value)}
+              label="Capacity"
             />
           </div>
+          <Input
+            placeholder="e.g. Watercolors, notebook, water bottle..."
+            value={supplies}
+            onChange={(e) => setSupplies(e.target.value)}
+            label="Supply List (Optional)"
+          />
           <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => {
-                setIsCreateModalOpen(false);
+                setIsModalOpen(false);
                 resetForm();
               }}
               className="w-full sm:w-auto order-2 sm:order-1"
             >
               Cancel
             </Button>
-            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Share with Village</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">
+              {isEditing ? "Save Changes" : "Share with Village"}
+            </Button>
           </div>
         </form>
       </Modal>
