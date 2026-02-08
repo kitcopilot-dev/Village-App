@@ -14,6 +14,8 @@ export interface Profile {
   description?: string;
   location?: string;
   children_ages?: string;
+  profile_latitude?: number;
+  profile_longitude?: number;
   created: string;
   updated: string;
 }

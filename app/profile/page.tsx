@@ -19,6 +19,10 @@ export default function ProfilePage() {
   const [editFamilyName, setEditFamilyName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editLocation, setEditLocation] = useState('');
+  const [editLat, setEditLat] = useState<number | undefined>(undefined);
+  const [editLon, setEditLon] = useState<number | undefined>(undefined);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [editChildrenAges, setEditChildrenAges] = useState('');
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
@@ -37,6 +41,8 @@ export default function ProfilePage() {
       setEditFamilyName(prof.family_name || '');
       setEditDescription(prof.description || '');
       setEditLocation(prof.location || '');
+      setEditLat(prof.profile_latitude);
+      setEditLon(prof.profile_longitude);
       setEditChildrenAges(prof.children_ages || '');
     }
   }, [pb.authStore.isValid, router]);
@@ -62,6 +68,8 @@ export default function ProfilePage() {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
+        profile_latitude: editLat,
+        profile_longitude: editLon,
         children_ages: editChildrenAges
       });
       
@@ -71,6 +79,8 @@ export default function ProfilePage() {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
+        profile_latitude: editLat,
+        profile_longitude: editLon,
         children_ages: editChildrenAges
       });
       
@@ -84,19 +94,63 @@ export default function ProfilePage() {
     }
   };
 
+  const fetchSuggestions = async (query: string) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+      const data = await res.json();
+      setSuggestions(data);
+      setShowSuggestions(true);
+    } catch (e) {
+      console.error('Suggestions fetch error:', e);
+    }
+  };
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEditLocation(val);
+    fetchSuggestions(val);
+  };
+
+  const selectSuggestion = (s: any) => {
+    setEditLocation(s.display_name);
+    setEditLat(parseFloat(s.lat));
+    setEditLon(parseFloat(s.lon));
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
   const useCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          setEditLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          setEditLat(latitude);
+          setEditLon(longitude);
+          
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await res.json();
+            const city = data.address.city || data.address.town || data.address.village;
+            const state = data.address.state;
+            if (city && state) {
+              setEditLocation(`${city}, ${state}`);
+            } else {
+              setEditLocation(data.display_name);
+            }
+          } catch (e) {
+            setEditLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
         },
         (error) => {
-          setMessage('✗ Could not get location: ' + error.message);
+          setToast({ message: 'Could not get location: ' + error.message, type: 'error' });
         }
       );
     } else {
-      setMessage('✗ Geolocation not supported');
+      setToast({ message: 'Geolocation not supported', type: 'error' });
     }
   };
 
@@ -164,21 +218,37 @@ export default function ProfilePage() {
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
               />
-              <div className="flex gap-4 mb-5">
-                <Input
-                  placeholder="Location"
-                  value={editLocation}
-                  onChange={(e) => setEditLocation(e.target.value)}
-                  className="flex-1 mb-0"
-                />
-                <Button 
-                  type="button"
-                  variant="ghost" 
-                  onClick={useCurrentLocation}
-                  className="whitespace-nowrap"
-                >
-                  📍 Use Current
-                </Button>
+              <div className="relative mb-5">
+                <div className="flex gap-4">
+                  <Input
+                    placeholder="Location (e.g., Chicago, IL)"
+                    value={editLocation}
+                    onChange={handleLocationChange}
+                    className="flex-1 mb-0"
+                    onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                  />
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    onClick={useCurrentLocation}
+                    className="whitespace-nowrap"
+                  >
+                    📍 Use Current
+                  </Button>
+                </div>
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border-2 border-border rounded-xl shadow-lg z-10 mt-1 max-h-48 overflow-y-auto overflow-x-hidden">
+                    {suggestions.map((s, i) => (
+                      <div 
+                        key={i} 
+                        className="px-4 py-2 hover:bg-bg-alt cursor-pointer text-sm border-b border-border last:border-0"
+                        onClick={() => selectSuggestion(s)}
+                      >
+                        {s.display_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <Input
                 placeholder="Children Ages (e.g., 5, 9, 13)"
