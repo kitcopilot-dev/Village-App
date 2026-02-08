@@ -7,6 +7,7 @@ import { Child, Course, Assignment } from '@/lib/types';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
 import { LoadingScreen } from '@/components/ui/Spinner';
 
 export default function TranscriptPage() {
