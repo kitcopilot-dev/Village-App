@@ -94,6 +94,7 @@ export interface PortfolioItem {
   title: string;
   subject?: string;
   image: string; // URL or File ID
+  description?: string;
   date: string;
   created: string;
   updated: string;
