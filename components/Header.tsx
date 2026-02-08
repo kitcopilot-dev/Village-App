@@ -54,6 +54,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               Attendance
             </Link>
             <Link 
+              href="/map" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/map' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              Map
+            </Link>
+            <Link 
               href="/assignments" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/assignments' 

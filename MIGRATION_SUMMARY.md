@@ -26,6 +26,7 @@ Successfully migrated **Village Homeschool** from vanilla HTML/CSS/JS to **Next.
 | Profile section | `/profile` | ✅ Complete |
 | `manage_kids.html` | `/manage-kids` | ✅ Complete |
 | Attendance section | `/attendance` | ✅ Complete |
+| Village Map section | `/map` | ✅ Complete |
 | Events section | `/events` | ✅ Complete |
 | Dashboard section | `/dashboard` | ✅ Complete |
 | Legal Guides section | `/legal-guides` | ✅ Complete |
