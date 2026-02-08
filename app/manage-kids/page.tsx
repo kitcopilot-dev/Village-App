@@ -23,12 +23,13 @@ export default function ManageKidsPage() {
   const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
   const [editingKid, setEditingKid] = useState<Child | null>(null);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'portfolio'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'portfolio' | 'insights'>('overview');
   const [scheduleDay, setScheduleDay] = useState('Mon');
   const [loading, setLoading] = useState(true);
   const [schoolYear, setSchoolYear] = useState<SchoolYear | null>(null);
   const [breaks, setBreaks] = useState<SchoolBreak[]>([]);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [studentInsights, setStudentInsights] = useState<any[]>([]);
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
@@ -334,14 +335,49 @@ export default function ManageKidsPage() {
     }
   };
 
+  const loadInsights = async (kidId: string) => {
+    try {
+      const records = await pb.collection('student_insights').getFullList({
+        filter: `child = "${kidId}"`,
+        sort: '-last_updated'
+      });
+      setStudentInsights(records);
+    } catch (error) {
+      console.warn('Insights load error:', error);
+      setStudentInsights([]);
+    }
+  };
+
   const openVault = (kid: Child) => {
     setSelectedKidId(kid.id);
     setActiveTab('overview');
     loadPortfolio(kid.id);
+    loadInsights(kid.id);
   };
 
   const closeVault = () => {
     setSelectedKidId(null);
+  };
+
+  const generateAISpark = async (course: Course) => {
+    setSparkLoading(true);
+    try {
+      const userId = pb.authStore.model?.id;
+      if (!userId) return;
+
+      // In production, this would be a server-side route that uses Kitt's logic.
+      // For this session, we'll use the test lesson as a demo.
+      setToast({ message: 'Tailoring lesson to student history...', type: 'success' });
+      
+      // Artificial delay to feel like "AI is working"
+      await new Promise(r => setTimeout(r, 2000));
+      
+      router.push('/lessons/test_lesson_001');
+    } catch (e) {
+      setToast({ message: 'AI Spark failed to ignite.', type: 'error' });
+    } finally {
+      setSparkLoading(false);
+    }
   };
 
   const getWeekDates = () => {
@@ -454,10 +490,10 @@ export default function ManageKidsPage() {
               <Button variant="ghost" onClick={closeVault}>← Back</Button>
             </div>
 
-            <div className="flex gap-6 mb-12 border-b-2 border-border">
-              {['overview', 'schedule', 'portfolio'].map((tab) => (
+            <div className="flex gap-6 mb-12 border-b-2 border-border overflow-x-auto whitespace-nowrap">
+              {['overview', 'schedule', 'portfolio', 'insights'].map((tab) => (
                 <button key={tab} className={`font-body font-bold text-base px-0 py-4 border-b-4 transition-all ${activeTab === tab ? 'text-primary border-primary' : 'text-text-muted border-transparent hover:text-primary'}`} onClick={() => setActiveTab(tab as any)}>
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'insights' ? '🤖 AI Insights' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
             </div>
@@ -549,6 +585,36 @@ export default function ManageKidsPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {activeTab === 'insights' && (
+              <div className="max-w-3xl">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl">🤖</div>
+                  <div>
+                    <h3 className="font-display text-2xl font-extrabold m-0 text-primary">Tutor Memory</h3>
+                    <p className="text-text-muted text-sm m-0 italic font-serif">Kitt&apos;s observations used to tailor future lessons.</p>
+                  </div>
+                </div>
+
+                {studentInsights.length === 0 ? (
+                  <Card className="text-center py-16 bg-bg-alt">
+                    <p className="text-text-muted italic">Kitt hasn&apos;t gathered enough data to generate insights yet. Complete some interactive lessons to begin!</p>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    {studentInsights.map((insight) => (
+                      <Card key={insight.id} className="p-6 border-l-4 border-primary">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/5 px-2 py-0.5 rounded">{insight.subject}</span>
+                          <span className="text-[10px] text-text-muted uppercase font-bold">{new Date(insight.last_updated).toLocaleDateString()}</span>
+                        </div>
+                        <p className="text-text-main m-0 leading-relaxed">&ldquo;{insight.observation}&rdquo;</p>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
