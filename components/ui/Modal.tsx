@@ -26,16 +26,18 @@ export function Modal({ isOpen, onClose, title, subtitle, children }: ModalProps
 
   return (
     <div 
-      className="fixed inset-0 bg-text/60 backdrop-blur-md flex justify-center items-center z-50"
+      className="fixed inset-0 bg-text/60 backdrop-blur-md flex justify-center items-start sm:items-center z-[100] p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div 
-        className="bg-bg p-6 sm:p-10 md:p-14 rounded-[2rem] w-[95%] sm:w-[90%] max-w-[550px] shadow-[0_40px_80px_rgba(0,0,0,0.25)] border border-border animate-modal-slide max-h-[90vh] overflow-y-auto"
+        className="bg-bg p-5 sm:p-10 md:p-14 rounded-[1.5rem] sm:rounded-[2rem] w-full max-w-[550px] shadow-[0_40px_80px_rgba(0,0,0,0.25)] border border-border animate-modal-slide my-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight mb-2 sm:mb-4">{title}</h2>
-        {subtitle && <p className="text-text-muted text-sm sm:text-base mb-6 sm:mb-10">{subtitle}</p>}
-        {children}
+        <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight mb-1 sm:mb-4 leading-tight">{title}</h2>
+        {subtitle && <p className="text-text-muted text-[10px] sm:text-base mb-4 sm:mb-10 leading-relaxed">{subtitle}</p>}
+        <div className="modal-content-container pb-6">
+          {children}
+        </div>
       </div>
     </div>
   );
