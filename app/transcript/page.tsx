@@ -126,201 +126,195 @@ export default function TranscriptPage() {
   return (
     <>
       <Header showLogout onLogout={() => { pb.authStore.clear(); router.push('/'); }} />
-      <main className="max-w-5xl mx-auto my-12 px-8 pb-20">
+      <main className="max-w-5xl mx-auto my-8 sm:my-12 px-4 sm:px-8 pb-20 animate-fade-in">
         {/* Controls - Hidden on print */}
-        <div className="print:hidden mb-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="print:hidden mb-12">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
             <div>
-              <h2 className="font-display text-4xl font-extrabold tracking-tight mb-2">Academic Transcript</h2>
-              <p className="text-text-muted">Generate a comprehensive academic record</p>
+              <h2 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight mb-2">Transcript</h2>
+              <p className="text-text-muted text-sm sm:text-base">Generate an official academic record for your records.</p>
             </div>
             <Button variant="ghost" onClick={() => router.push('/dashboard')}>← Dashboard</Button>
           </div>
 
-          <div className="flex gap-4 items-end">
-            <Select 
-              label="Select Student" 
-              value={selectedKidId} 
-              onChange={(e) => setSelectedKidId(e.target.value)}
-              className="flex-1"
-            >
-              {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
-            </Select>
-            <Button onClick={handlePrint} disabled={!selectedKidId}>
-              🖨️ Print / Export PDF
-            </Button>
-          </div>
+          <Card className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row gap-6 items-end">
+              <div className="flex-1 w-full">
+                <Select 
+                  label="Select Student" 
+                  value={selectedKidId} 
+                  onChange={(e) => setSelectedKidId(e.target.value)}
+                >
+                  {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+                </Select>
+              </div>
+              <Button onClick={handlePrint} disabled={!selectedKidId} className="w-full md:w-auto">
+                🖨️ Print / Save as PDF
+              </Button>
+            </div>
+          </Card>
         </div>
 
         {/* Transcript Document - Optimized for printing */}
         {selectedKid && (
-          <div className="bg-white border-2 border-border rounded-lg p-12 print:border-0 print:p-8">
-            {/* Header */}
-            <div className="text-center mb-12 pb-8 border-b-2 border-border">
-              <h1 className="font-display text-4xl font-extrabold mb-2">Academic Transcript</h1>
-              <p className="text-lg text-text-muted">Village Homeschool</p>
-              <p className="text-sm text-text-muted mt-4">Generated: {new Date().toLocaleDateString()}</p>
-            </div>
-
-            {/* Student Information */}
-            <div className="mb-12">
-              <h2 className="font-display text-2xl font-bold mb-4 text-primary border-b pb-2">Student Information</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-text-muted mb-1">Student Name</p>
-                  <p className="font-bold text-lg">{selectedKid.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-text-muted mb-1">Age</p>
-                  <p className="font-bold text-lg">{selectedKid.age} years</p>
-                </div>
-                {selectedKid.grade && (
-                  <div>
-                    <p className="text-sm text-text-muted mb-1">Grade Level</p>
-                    <p className="font-bold text-lg">{selectedKid.grade}</p>
-                  </div>
-                )}
-                {selectedKid.focus && (
-                  <div>
-                    <p className="text-sm text-text-muted mb-1">Focus Areas</p>
-                    <p className="font-bold text-lg">{selectedKid.focus}</p>
-                  </div>
-                )}
+          <div className="bg-white border-2 border-border rounded-[2rem] p-8 md:p-16 shadow-shadow print:border-0 print:p-0 print:shadow-none mx-auto max-w-[8.5in]">
+            {/* Document Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16 pb-12 border-b-4 border-primary/10">
+              <div>
+                <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold uppercase tracking-tighter m-0 mb-1">
+                  Village<span className="text-secondary">.</span> Homeschool
+                </h1>
+                <p className="font-serif italic text-lg text-text-muted m-0">Official Academic Record</p>
+              </div>
+              <div className="text-left md:text-right">
+                <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Issue Date</p>
+                <p className="font-bold text-lg m-0">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
               </div>
             </div>
 
-            {/* Academic Summary */}
-            {gradedAssignments.length > 0 && (
-              <div className="mb-12">
-                <h2 className="font-display text-2xl font-bold mb-4 text-primary border-b pb-2">Academic Summary</h2>
-                <div className="grid grid-cols-3 gap-8">
-                  <div className="text-center p-6 bg-bg-alt rounded-lg">
-                    <p className="text-sm text-text-muted mb-2">Cumulative GPA</p>
-                    <p className="font-display text-4xl font-extrabold text-primary">{overallGPA.toFixed(2)}</p>
-                    <p className="text-xs text-text-muted mt-1">out of 4.0</p>
+            {/* Student Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+              <section>
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-6 border-b pb-2">Student Information</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-text-muted">Full Name</span>
+                    <span className="text-sm font-bold text-text-main">{selectedKid.name}</span>
                   </div>
-                  <div className="text-center p-6 bg-bg-alt rounded-lg">
-                    <p className="text-sm text-text-muted mb-2">Overall Average</p>
-                    <p className="font-display text-4xl font-extrabold text-secondary">{overallAverage.toFixed(1)}%</p>
-                    <p className="text-xs text-text-muted mt-1">Grade: {scoreToLetterGrade(overallAverage)}</p>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-text-muted">Current Age</span>
+                    <span className="text-sm font-bold text-text-main">{selectedKid.age} years</span>
                   </div>
-                  <div className="text-center p-6 bg-bg-alt rounded-lg">
-                    <p className="text-sm text-text-muted mb-2">Assignments Completed</p>
-                    <p className="font-display text-4xl font-extrabold text-accent">{gradedAssignments.length}</p>
-                    <p className="text-xs text-text-muted mt-1">graded work</p>
+                  {selectedKid.grade && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-text-muted">Grade Level</span>
+                      <span className="text-sm font-bold text-text-main">{selectedKid.grade}</span>
+                    </div>
+                  )}
+                  {selectedKid.focus && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-text-muted">Primary Focus</span>
+                      <span className="text-sm font-bold text-text-main">{selectedKid.focus}</span>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b pb-2">Academic Summary</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-bg-alt rounded-2xl text-center">
+                    <p className="text-[10px] font-bold uppercase text-text-muted mb-1">Cumulative GPA</p>
+                    <p className="font-display text-2xl font-extrabold text-primary m-0">{overallGPA.toFixed(2)}</p>
+                  </div>
+                  <div className="p-4 bg-bg-alt rounded-2xl text-center">
+                    <p className="text-[10px] font-bold uppercase text-text-muted mb-1">Letter Grade</p>
+                    <p className="font-display text-2xl font-extrabold text-secondary m-0">{scoreToLetterGrade(overallAverage)}</p>
+                  </div>
+                  <div className="p-4 bg-bg-alt rounded-2xl text-center col-span-2">
+                    <p className="text-[10px] font-bold uppercase text-text-muted mb-1">Work Samples Completed</p>
+                    <p className="font-display text-2xl font-extrabold text-accent m-0">{gradedAssignments.length}</p>
                   </div>
                 </div>
-              </div>
-            )}
+              </section>
+            </div>
 
-            {/* Course Record */}
+            {/* Course Record Table */}
             {courses.length > 0 && (
-              <div className="mb-12">
-                <h2 className="font-display text-2xl font-bold mb-4 text-primary border-b pb-2">Course Record</h2>
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b-2 border-border">
-                      <th className="text-left py-3 font-bold">Course Name</th>
-                      <th className="text-center py-3 font-bold">Progress</th>
-                      <th className="text-center py-3 font-bold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courses.map(course => {
-                      const progress = Math.min(course.current_lesson - 1, course.total_lessons);
-                      const percentage = Math.round((progress / course.total_lessons) * 100);
-                      const isComplete = course.current_lesson > course.total_lessons;
-                      return (
-                        <tr key={course.id} className="border-b border-border">
-                          <td className="py-3 font-semibold">{course.name}</td>
-                          <td className="text-center py-3">{progress} / {course.total_lessons} lessons ({percentage}%)</td>
-                          <td className="text-center py-3">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              isComplete ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                            }`}>
-                              {isComplete ? 'Completed' : 'In Progress'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Subject Breakdown */}
-            {Object.keys(subjectData).length > 0 && (
-              <div className="mb-12">
-                <h2 className="font-display text-2xl font-bold mb-4 text-primary border-b pb-2">Subject Performance</h2>
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b-2 border-border">
-                      <th className="text-left py-3 font-bold">Subject</th>
-                      <th className="text-center py-3 font-bold">Assignments</th>
-                      <th className="text-center py-3 font-bold">Average</th>
-                      <th className="text-center py-3 font-bold">Grade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(subjectData)
-                      .sort((a, b) => b[1].average - a[1].average)
-                      .map(([subject, data]) => (
-                        <tr key={subject} className="border-b border-border">
-                          <td className="py-3 font-semibold">{subject}</td>
-                          <td className="text-center py-3">{data.assignments.length}</td>
-                          <td className="text-center py-3 font-bold">{data.average.toFixed(1)}%</td>
-                          <td className="text-center py-3">
-                            <span className="font-bold text-lg">{scoreToLetterGrade(data.average)}</span>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Assignment History */}
-            {gradedAssignments.length > 0 && (
-              <div className="mb-12 page-break-before">
-                <h2 className="font-display text-2xl font-bold mb-4 text-primary border-b pb-2">Assignment History</h2>
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b-2 border-border">
-                      <th className="text-left py-2 font-bold">Date</th>
-                      <th className="text-left py-2 font-bold">Title</th>
-                      <th className="text-left py-2 font-bold">Subject</th>
-                      <th className="text-center py-2 font-bold">Score</th>
-                      <th className="text-center py-2 font-bold">Grade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {gradedAssignments.map(a => (
-                      <tr key={a.id} className="border-b border-border">
-                        <td className="py-2">{new Date(a.due_date).toLocaleDateString()}</td>
-                        <td className="py-2 font-medium">{a.title}</td>
-                        <td className="py-2">{a.subject || '—'}</td>
-                        <td className="text-center py-2 font-bold">{a.score}%</td>
-                        <td className="text-center py-2 font-bold">{scoreToLetterGrade(a.score || 0)}</td>
+              <div className="mb-16">
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-6 border-b pb-2">Course Record</h3>
+                <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-bg-alt">
+                        <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Course Title</th>
+                        <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Progress</th>
+                        <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {courses.map(course => {
+                        const progress = Math.min(course.current_lesson - 1, course.total_lessons);
+                        const percentage = Math.round((progress / course.total_lessons) * 100);
+                        const isComplete = course.current_lesson > course.total_lessons;
+                        return (
+                          <tr key={course.id} className="hover:bg-bg-alt/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-bold text-text-main">{course.name}</td>
+                            <td className="px-6 py-4 text-sm text-center text-text-muted">
+                              {progress} / {course.total_lessons} lessons ({percentage}%)
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
+                                isComplete ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {isComplete ? 'Completed' : 'In Progress'}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
-            {/* Footer */}
-            <div className="mt-16 pt-8 border-t-2 border-border text-center text-sm text-text-muted">
-              <p>This transcript is an official record of academic work completed through Village Homeschool.</p>
-              <p className="mt-2">For questions or verification, please contact the family.</p>
+            {/* Subject Performance Table */}
+            {Object.keys(subjectData).length > 0 && (
+              <div className="mb-16">
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary mb-6 border-b pb-2">Subject Performance</h3>
+                <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-bg-alt">
+                        <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Subject</th>
+                        <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Work items</th>
+                        <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Avg. Score</th>
+                        <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-wider text-text-muted">Final Grade</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {Object.entries(subjectData)
+                        .sort((a, b) => b[1].average - a[1].average)
+                        .map(([subject, data]) => (
+                          <tr key={subject} className="hover:bg-bg-alt/30 transition-colors">
+                            <td className="px-6 py-4 text-sm font-bold text-text-main">{subject}</td>
+                            <td className="px-6 py-4 text-sm text-center text-text-muted">{data.assignments.length}</td>
+                            <td className="px-6 py-4 text-sm text-center font-bold text-text-main">{data.average.toFixed(1)}%</td>
+                            <td className="px-6 py-4 text-right">
+                              <span className="font-display font-bold text-lg text-primary">{scoreToLetterGrade(data.average)}</span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Signature Section */}
+            <div className="mt-24 pt-12 border-t-2 border-dashed border-border grid grid-cols-2 gap-16">
+              <div className="text-center">
+                <div className="h-16 border-b border-text-muted mb-4 mx-auto w-full max-w-[250px]"></div>
+                <p className="text-[10px] font-bold uppercase text-text-muted">Parent / Instructor Signature</p>
+              </div>
+              <div className="text-center">
+                <div className="h-16 border-b border-text-muted mb-4 mx-auto w-full max-w-[250px]"></div>
+                <p className="text-[10px] font-bold uppercase text-text-muted">Date of Certification</p>
+              </div>
+            </div>
+
+            {/* Legal Footer */}
+            <div className="mt-16 text-center text-[10px] text-text-muted leading-relaxed max-w-lg mx-auto italic">
+              This academic transcript is a certified record of home instruction. Village Homeschool provides the administrative framework, but the parent/instructor is solely responsible for the accuracy of the data and compliance with local education laws.
             </div>
           </div>
         )}
 
         {!selectedKid && kids.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-text-muted text-lg">No children added yet.</p>
-            <Button className="mt-6" onClick={() => router.push('/manage-kids')}>
+          <div className="text-center py-24 bg-bg-alt rounded-[3rem] border-2 border-dashed border-border">
+            <p className="text-text-muted text-xl font-serif italic mb-8">No students found in your village.</p>
+            <Button size="lg" onClick={() => router.push('/manage-kids')}>
               Add Your First Child
             </Button>
           </div>
