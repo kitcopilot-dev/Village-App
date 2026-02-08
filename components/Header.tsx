@@ -3,14 +3,19 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './ui/Button';
+import { getPocketBase } from '@/lib/pocketbase';
 
 interface HeaderProps {
   onLogout?: () => void;
   showLogout?: boolean;
 }
 
+const ADMIN_EMAILS = ['jtown.80@gmail.com', 'jlynch8080@pm.me'];
+
 export function Header({ onLogout, showLogout = false }: HeaderProps) {
   const pathname = usePathname();
+  const pb = getPocketBase();
+  const isAdmin = pb.authStore.isValid && ADMIN_EMAILS.includes(pb.authStore.model?.email);
   
   return (
     <header className="bg-bg/80 backdrop-blur-md px-6 md:px-16 py-4 md:py-6 flex justify-between items-center sticky top-0 z-50 transition-all border-b border-border/50">
@@ -23,6 +28,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
       <nav className="flex gap-2 md:gap-4 items-center">
         {showLogout && (
           <>
+            {isAdmin && (
+              <Link 
+                href="/admin" 
+                className={`hidden md:inline-block px-3 py-2 rounded-lg font-bold text-sm transition-colors text-accent hover:bg-accent/10 ${
+                  pathname === '/admin' ? 'bg-accent/20' : ''
+                }`}
+              >
+                🛠️ Admin
+              </Link>
+            )}
             <Link 
               href="/dashboard" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${

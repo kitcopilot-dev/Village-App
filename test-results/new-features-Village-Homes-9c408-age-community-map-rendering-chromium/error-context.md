@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+    - img [ref=e8]
+  - alert [ref=e11]
+  - banner [ref=e12]:
+    - link "Village." [ref=e13] [cursor=pointer]:
+      - /url: /
+      - heading "Village." [level=1] [ref=e14]
+    - navigation [ref=e15]:
+      - link "Dashboard" [ref=e16] [cursor=pointer]:
+        - /url: /dashboard
+      - link "Manage" [ref=e17] [cursor=pointer]:
+        - /url: /manage-kids
+      - link "Attendance" [ref=e18] [cursor=pointer]:
+        - /url: /attendance
+      - link "Map" [ref=e19] [cursor=pointer]:
+        - /url: /map
+      - link "Assignments" [ref=e20] [cursor=pointer]:
+        - /url: /assignments
+      - link "Portfolio" [ref=e21] [cursor=pointer]:
+        - /url: /portfolio
+      - link "Transcript" [ref=e22] [cursor=pointer]:
+        - /url: /transcript
+      - link "Calendar" [ref=e23] [cursor=pointer]:
+        - /url: /calendar
+      - button "Logout" [ref=e24] [cursor=pointer]
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - heading "Your Profile" [level=2] [ref=e27]
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - paragraph [ref=e30]:
+            - strong [ref=e31]: "Email:"
+            - text: test@example.com
+          - paragraph [ref=e32]:
+            - strong [ref=e33]: "Family:"
+            - text: Lynch Family
+          - paragraph [ref=e34]:
+            - strong [ref=e35]: "About:"
+            - text: No description provided.
+          - paragraph [ref=e36]:
+            - strong [ref=e37]: "Location:"
+            - text: Chicago, IL
+          - paragraph [ref=e38]:
+            - strong [ref=e39]: "Kids' Ages:"
+            - text: None listed
+        - generic [ref=e40]:
+          - button "Edit Profile" [ref=e41] [cursor=pointer]
+          - button "View Events" [ref=e42] [cursor=pointer]
+          - button "🧒 Manage Kids" [ref=e43] [cursor=pointer]
+          - button "📚 Dashboard" [ref=e44] [cursor=pointer]
+          - button "⚖️ Legal Guides" [ref=e45] [cursor=pointer]
+```
