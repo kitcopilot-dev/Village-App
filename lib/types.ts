@@ -132,3 +132,14 @@ export interface SchoolBreak {
   created: string;
   updated: string;
 }
+
+export interface Attendance {
+  id: string;
+  user: string;
+  child: string;
+  date: string;
+  status: 'present' | 'absent' | 'half-day' | 'sick' | 'holiday';
+  notes?: string;
+  created: string;
+  updated: string;
+}

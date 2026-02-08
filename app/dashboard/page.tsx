@@ -213,17 +213,20 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-0">Family Dashboard</h2>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => router.push('/assignments')}>
+          <div className="flex gap-3 flex-wrap">
+            <Button variant="outline" size="sm" onClick={() => router.push('/attendance')}>
+              📅 Attendance
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => router.push('/assignments')}>
               📝 Assignments
             </Button>
-            <Button variant="outline" onClick={() => router.push('/transcript')}>
+            <Button variant="outline" size="sm" onClick={() => router.push('/transcript')}>
               📄 Transcript
             </Button>
-            <Button variant="outline" onClick={() => router.push('/calendar')}>
-              📅 Calendar
+            <Button variant="outline" size="sm" onClick={() => router.push('/calendar')}>
+              🗓️ Calendar
             </Button>
-            <Button variant="ghost" onClick={() => router.push('/profile')}>← Profile</Button>
+            <Button variant="ghost" size="sm" onClick={() => router.push('/profile')}>← Profile</Button>
           </div>
         </div>
 

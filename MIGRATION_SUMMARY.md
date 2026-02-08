@@ -25,6 +25,7 @@ Successfully migrated **Village Homeschool** from vanilla HTML/CSS/JS to **Next.
 | `index.html` (Login/Register) | `/` (app/page.tsx) | ✅ Complete |
 | Profile section | `/profile` | ✅ Complete |
 | `manage_kids.html` | `/manage-kids` | ✅ Complete |
+| Attendance section | `/attendance` | ✅ Complete |
 | Events section | `/events` | ✅ Complete |
 | Dashboard section | `/dashboard` | ✅ Complete |
 | Legal Guides section | `/legal-guides` | ✅ Complete |
