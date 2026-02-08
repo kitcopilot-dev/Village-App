@@ -334,13 +334,36 @@ export default function ManageKidsPage() {
   const weekDates = getWeekDates();
 
   const isCourseActiveOnDay = (course: Course, dayShort: string) => {
-    // If no days selected, default to all days (safety)
-    if (!course.active_days || course.active_days.trim() === "") return true;
+    // If no days selected or field missing, default to all weekdays (Mon-Fri)
+    if (!course.active_days) return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(dayShort);
     
-    // Normalize to array
-    const activeDays = typeof course.active_days === 'string' 
-      ? course.active_days.split(',').map(d => d.trim()) 
-      : Array.isArray(course.active_days) ? course.active_days : [];
+    // Normalize to array (handle strings, JSON strings, and arrays)
+    let activeDays: string[] = [];
+    if (typeof course.active_days === 'string') {
+      if (course.active_days.startsWith('[') && course.active_days.endsWith(']')) {
+        try {
+          activeDays = JSON.parse(course.active_days);
+        } catch {
+          activeDays = course.active_days.split(',').map(d => d.trim());
+        }
+      } else {
+        activeDays = course.active_days.split(',').map(d => d.trim());
+      }
+    } else if (Array.isArray(course.active_days)) {
+      activeDays = course.active_days;
+    }
+    
+    activeDays = activeDays.filter(Boolean);
+      
+    // If specifically empty, it means no days selected (don't default to all)
+    if (activeDays.length === 0 && course.active_days !== undefined && course.active_days !== null) {
+      return false;
+    }
+    
+    // Default to true for Mon-Fri if still no days found (safety for legacy)
+    if (activeDays.length === 0) {
+      return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].includes(dayShort);
+    }
       
     return activeDays.includes(dayShort);
   };

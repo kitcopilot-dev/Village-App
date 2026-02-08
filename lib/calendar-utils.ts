@@ -26,9 +26,29 @@ export function getExpectedLesson(
   }
 
   // Active days for this course
-  const activeDays = course.active_days ? course.active_days.split(',') : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  let activeDays: string[] = [];
+  if (course.active_days) {
+    if (typeof course.active_days === 'string') {
+      if (course.active_days.startsWith('[') && course.active_days.endsWith(']')) {
+        try {
+          activeDays = JSON.parse(course.active_days);
+        } catch {
+          activeDays = course.active_days.split(',').map(d => d.trim());
+        }
+      } else {
+        activeDays = course.active_days.split(',').map(d => d.trim());
+      }
+    } else if (Array.isArray(course.active_days)) {
+      activeDays = course.active_days;
+    }
+  } else {
+    activeDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  }
+  
+  activeDays = activeDays.filter(Boolean);
+
   const dayMap: Record<string, number> = { 'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6 };
-  const activeIndices = activeDays.map(d => dayMap[d]);
+  const activeIndices = activeDays.map(d => dayMap[d]).filter(v => v !== undefined);
 
   let schoolDayCount = 0;
   let targetLesson = 0;

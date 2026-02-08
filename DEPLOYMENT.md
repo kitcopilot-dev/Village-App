@@ -99,6 +99,7 @@ Make sure these collections exist in your PocketBase instance:
 - `name` (text)
 - `total_lessons` (number)
 - `current_lesson` (number)
+- `active_days` (text, optional - comma separated e.g. "Mon,Tue,Wed")
 
 ### events
 - `user` (relation to users)
