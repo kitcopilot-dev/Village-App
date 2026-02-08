@@ -80,7 +80,7 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
             variant="outline" 
             size="sm"
             onClick={onLogout}
-            className="hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+            className="hover:bg-red-50 hover:text-red-500 hover:border-red-200 py-2 px-3 sm:px-4 text-xs sm:text-sm"
           >
             Logout
           </Button>
