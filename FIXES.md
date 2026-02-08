@@ -16,3 +16,13 @@ The `user` field's `options.collectionId` was changed from `"users"` to `"_pb_us
 **Result:** School year creation now works correctly.
 
 **Note:** This was a manual database fix. The migration files in `pb_migrations/` still reference `"users"` but the live database has been corrected.
+
+## 2026-02-08: Fixed portfolio collection validation
+
+**Issue:** Portfolio samples were failing to save.
+
+**Fix Applied:** Loosened the schema validation for the `portfolio` collection.
+1. Converted `user` and `child` from Relation to Text.
+2. Converted `date` from Date to Text.
+
+This bypasses strict PocketBase validation that was causing the save to fail.

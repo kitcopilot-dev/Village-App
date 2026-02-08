@@ -39,6 +39,7 @@ export default function PortfolioPage() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Filters
   const [filterChild, setFilterChild] = useState('all');
@@ -78,6 +79,20 @@ export default function PortfolioPage() {
       console.error('Portfolio load error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImageFile(file);
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
     }
   };
 
@@ -138,6 +153,7 @@ export default function PortfolioPage() {
     setDate(new Date().toISOString().split('T')[0]);
     setDescription('');
     setImageFile(null);
+    setImagePreview(null);
   };
 
   const filteredItems = items.filter(i => {
@@ -267,12 +283,19 @@ export default function PortfolioPage() {
               <label className="block text-[10px] sm:text-xs font-bold mb-1.5 sm:mb-2 uppercase tracking-wide text-primary">
                 Photo / Document
               </label>
-              <input 
-                type="file" 
-                accept="image/*,.pdf" 
-                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                className="w-full text-xs text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white"
-              />
+              <div className="flex flex-col gap-4">
+                <input 
+                  type="file" 
+                  accept="image/*,.pdf" 
+                  onChange={handleFileChange}
+                  className="w-full text-xs text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white"
+                />
+                {imagePreview && (
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-border shadow-sm animate-fade-in">
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <Textarea label="Notes (What was learned?)" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Learned about catalysts and exothermic reactions." />
