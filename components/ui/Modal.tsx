@@ -30,7 +30,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children }: ModalProps
       onClick={onClose}
     >
       <div 
-        className="bg-bg p-14 rounded-[2rem] w-[90%] max-w-[550px] shadow-[0_40px_80px_rgba(0,0,0,0.25)] border border-border animate-modal-slide"
+        className="bg-bg p-8 md:p-14 rounded-[2rem] w-[95%] sm:w-[90%] max-w-[550px] shadow-[0_40px_80px_rgba(0,0,0,0.25)] border border-border animate-modal-slide"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-display text-4xl font-extrabold tracking-tight mb-4">{title}</h2>

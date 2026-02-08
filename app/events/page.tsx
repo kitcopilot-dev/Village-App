@@ -225,7 +225,7 @@ export default function EventsPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
           />
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Input
               type="date"
               value={date}
@@ -245,7 +245,7 @@ export default function EventsPage() {
             onChange={(e) => setLocation(e.target.value)}
             required
           />
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Select value={ageSuitability} onChange={(e) => setAgeSuitability(e.target.value)}>
               <option>All Ages</option>
               <option value="0-5">0-5 (Preschool)</option>
@@ -260,7 +260,7 @@ export default function EventsPage() {
               onChange={(e) => setMaxCapacity(e.target.value)}
             />
           </div>
-          <div className="flex justify-end gap-6 mt-12">
+          <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
             <Button 
               type="button" 
               variant="outline" 
@@ -268,10 +268,11 @@ export default function EventsPage() {
                 setIsCreateModalOpen(false);
                 resetForm();
               }}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               Cancel
             </Button>
-            <Button type="submit">Share with Village</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Share with Village</Button>
           </div>
         </form>
       </Modal>

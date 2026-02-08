@@ -262,21 +262,21 @@ export default function AssignmentsPage() {
       >
         <form onSubmit={handleSave} className="space-y-4">
           <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Weekly Math Quiz" />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select label="Child" value={childId} onChange={(e) => setChildId(e.target.value)} required>
               {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
             </Select>
             <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Math" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Due Date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
             <Input label="Initial Score % (Optional)" type="number" value={score} onChange={(e) => setScore(e.target.value)} placeholder="Leave blank if pending" />
           </div>
           <Textarea label="Description / Instructions" value={description} onChange={(e) => setDescription(e.target.value)} />
           
-          <div className="flex justify-end gap-4 mt-8">
-            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Create Assignment</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
+            <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Create Assignment</Button>
           </div>
         </form>
       </Modal>

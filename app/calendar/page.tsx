@@ -348,9 +348,9 @@ export default function CalendarPage() {
             />
           </div>
           
-          <div className="flex justify-end gap-4 mt-8">
-            <Button type="button" variant="outline" onClick={() => setIsYearModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Create School Year</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
+            <Button type="button" variant="outline" onClick={() => setIsYearModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Create School Year</Button>
           </div>
         </form>
       </Modal>
@@ -387,9 +387,9 @@ export default function CalendarPage() {
             />
           </div>
           
-          <div className="flex justify-end gap-4 mt-8">
-            <Button type="button" variant="outline" onClick={() => setIsBreakModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Add Break</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
+            <Button type="button" variant="outline" onClick={() => setIsBreakModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Add Break</Button>
           </div>
         </form>
       </Modal>

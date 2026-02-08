@@ -539,9 +539,9 @@ export default function ManageKidsPage() {
             </Select>
           </div>
           <Input placeholder="Current Focus" value={kidFocus} onChange={(e) => setKidFocus(e.target.value)} />
-          <div className="flex justify-end gap-6 mt-12">
-            <Button type="button" variant="outline" onClick={() => setIsKidModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Profile</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
+            <Button type="button" variant="outline" onClick={() => setIsKidModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Save Profile</Button>
           </div>
         </form>
       </Modal>
@@ -561,9 +561,9 @@ export default function ManageKidsPage() {
               ))}
             </div>
           </div>
-          <div className="flex justify-end gap-6 mt-12">
-            <Button type="button" variant="outline" onClick={() => setIsCourseModalOpen(false)}>Cancel</Button>
-            <Button type="submit">{editingCourse ? 'Update Course' : 'Add Course'}</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
+            <Button type="button" variant="outline" onClick={() => setIsCourseModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">{editingCourse ? 'Update Course' : 'Add Course'}</Button>
           </div>
         </form>
       </Modal>
@@ -576,9 +576,9 @@ export default function ManageKidsPage() {
             <label className="block text-sm font-bold text-primary mb-2">Photo / Work Sample</label>
             <input type="file" accept="image/*,.pdf" onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)} className="block w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white" />
           </div>
-          <div className="flex justify-end gap-6 mt-12">
-            <Button type="button" variant="outline" onClick={() => setIsPortfolioModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Save Project</Button>
+          <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
+            <Button type="button" variant="outline" onClick={() => setIsPortfolioModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Save Project</Button>
           </div>
         </form>
       </Modal>
