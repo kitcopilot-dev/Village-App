@@ -365,15 +365,33 @@ export default function ManageKidsPage() {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
 
-      // In production, this would be a server-side route that uses Kitt's logic.
-      // For this session, we'll use the test lesson as a demo.
-      setToast({ message: 'Tailoring lesson to student history...', type: 'success' });
+      // Call the standalone Village AI API
+      const response = await fetch('/api/generate-spark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          childId: course.child,
+          subject: course.name,
+          courseName: course.name,
+          gradeLevel: selectedKid?.grade || 'Unknown'
+        })
+      });
+
+      if (!response.ok) throw new Error('API call failed');
       
-      // Artificial delay to feel like "AI is working"
-      await new Promise(r => setTimeout(r, 2000));
-      
-      router.push('/lessons/test_lesson_001');
+      const lessonData = await response.json();
+
+      // Save the newly generated lesson to PocketBase
+      const newLesson = await pb.collection('lessons').create({
+        user: userId,
+        child: course.child,
+        ...lessonData
+      });
+
+      setToast({ message: 'Tailored lesson generated!', type: 'success' });
+      router.push(`/lessons/${newLesson.id}`);
     } catch (e) {
+      console.error('AI Spark error:', e);
       setToast({ message: 'AI Spark failed to ignite.', type: 'error' });
     } finally {
       setSparkLoading(false);
