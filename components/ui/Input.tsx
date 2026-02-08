@@ -13,7 +13,7 @@ export function Input({ label, className = '', ...props }: InputProps) {
         </label>
       )}
       <input
-        className={`w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] font-body text-sm sm:text-base transition-all bg-bg focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(75,99,68,0.1)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`w-full max-w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] font-body text-sm sm:text-base transition-all bg-bg focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(75,99,68,0.1)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
         {...props}
       />
     </div>
@@ -33,7 +33,7 @@ export function Textarea({ label, className = '', ...props }: TextareaProps) {
         </label>
       )}
       <textarea
-        className={`w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] font-body text-sm sm:text-base transition-all bg-bg min-h-24 sm:min-h-32 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(75,99,68,0.1)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`w-full max-w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] font-body text-sm sm:text-base transition-all bg-bg min-h-24 sm:min-h-32 focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(75,99,68,0.1)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
         {...props}
       />
     </div>
@@ -54,7 +54,7 @@ export function Select({ label, className = '', children, ...props }: SelectProp
       )}
       <select
         className={`
-          w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] 
+          w-full max-w-full px-4 sm:px-5 py-3 sm:py-4 mb-0 border-2 border-border rounded-[1rem] sm:rounded-[1.25rem] 
           font-body text-sm sm:text-base transition-all bg-bg
           focus:outline-none focus:border-primary focus:bg-white focus:shadow-[0_0_0_4px_rgba(75,99,68,0.1)]
           disabled:opacity-50 disabled:cursor-not-allowed

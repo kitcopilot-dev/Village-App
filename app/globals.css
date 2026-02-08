@@ -125,3 +125,16 @@ body::before {
 .animate-modal-slide {
   animation: modalSlide 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* Fix for date inputs stretching on mobile */
+input[type="date"] {
+  min-width: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  display: block;
+}
+
+/* Ensure all inputs respect box sizing and don't overflow */
+input, select, textarea {
+  max-width: 100%;
+}
