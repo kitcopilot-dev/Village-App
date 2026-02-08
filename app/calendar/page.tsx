@@ -331,7 +331,7 @@ export default function CalendarPage() {
             required 
             placeholder="e.g. 2024-2025" 
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input 
               label="Start Date" 
               type="date" 
@@ -370,7 +370,7 @@ export default function CalendarPage() {
             required 
             placeholder="e.g. Winter Break, Thanksgiving" 
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input 
               label="Start Date" 
               type="date" 
