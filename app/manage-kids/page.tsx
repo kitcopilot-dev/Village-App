@@ -207,7 +207,16 @@ export default function ManageKidsPage() {
       setCurrentLesson(course.current_lesson.toString());
       
       if (typeof course.active_days === 'string') {
-        setActiveDays(course.active_days.split(',').filter(d => d.trim() !== ''));
+        const cleaned = course.active_days.trim();
+        if (cleaned.startsWith('[') && cleaned.endsWith(']')) {
+          try {
+            setActiveDays(JSON.parse(cleaned));
+          } catch {
+            setActiveDays(cleaned.split(',').map(d => d.trim()).filter(Boolean));
+          }
+        } else {
+          setActiveDays(cleaned.split(',').map(d => d.trim()).filter(Boolean));
+        }
       } else if (Array.isArray(course.active_days)) {
         setActiveDays(course.active_days);
       } else {
@@ -340,20 +349,21 @@ export default function ManageKidsPage() {
     // Normalize to array (handle strings, JSON strings, and arrays)
     let activeDays: string[] = [];
     if (typeof course.active_days === 'string') {
-      if (course.active_days.startsWith('[') && course.active_days.endsWith(']')) {
+      const cleaned = course.active_days.trim();
+      if (cleaned.startsWith('[') && cleaned.endsWith(']')) {
         try {
-          activeDays = JSON.parse(course.active_days);
+          activeDays = JSON.parse(cleaned);
         } catch {
-          activeDays = course.active_days.split(',').map(d => d.trim());
+          activeDays = cleaned.split(',').map(d => d.trim());
         }
       } else {
-        activeDays = course.active_days.split(',').map(d => d.trim());
+        activeDays = cleaned.split(',').map(d => d.trim());
       }
     } else if (Array.isArray(course.active_days)) {
       activeDays = course.active_days;
     }
     
-    activeDays = activeDays.filter(Boolean);
+    activeDays = activeDays.map(d => d.trim()).filter(Boolean);
       
     // If specifically empty, it means no days selected (don't default to all)
     if (activeDays.length === 0 && course.active_days !== undefined && course.active_days !== null) {
