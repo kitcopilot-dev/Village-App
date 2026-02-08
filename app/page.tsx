@@ -86,7 +86,7 @@ export default function Home() {
         <section className="pt-20 pb-16 md:pt-32 md:pb-24 text-center relative overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-3xl -z-10" />
           
-          <h1 className="font-display text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9]">
+          <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] break-words">
             Homeschooling is <span className="text-primary italic">Better</span> <br className="hidden md:block" /> Together.
           </h1>
           <p className="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-12 font-serif italic">
