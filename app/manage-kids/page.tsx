@@ -465,7 +465,7 @@ export default function ManageKidsPage() {
                                     {mapping.status === 'on-track' ? 'On Track' : `${mapping.diff} Lessons ${mapping.status}`}
                                   </span>
                                 )}
-                                <div className="flex gap-2 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex gap-2 ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                   <button onClick={() => openCourseModal(course)} className="text-text-muted hover:text-primary">✏️</button>
                                   <button onClick={() => handleDeleteCourse(course.id)} className="text-text-muted hover:text-red-500">🗑️</button>
                                 </div>
