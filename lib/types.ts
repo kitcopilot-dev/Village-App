@@ -143,3 +143,52 @@ export interface Attendance {
   created: string;
   updated: string;
 }
+
+export interface Lesson {
+  id: string;
+  user: string;
+  child?: string;
+  title: string;
+  grade_level: string;
+  subject: string;
+  type: 'shared' | 'tailored';
+  content: {
+    hook: string;
+    activity: string;
+    resources: { label: string; url: string }[];
+  };
+  interactive_data: {
+    questions: {
+      id: string;
+      text: string;
+      type: 'multiple-choice' | 'text' | 'reflection';
+      options?: string[];
+      answer?: string;
+    }[];
+  };
+  created: string;
+  updated: string;
+}
+
+export interface StudentProgress {
+  id: string;
+  user: string;
+  child: string;
+  lesson: string;
+  score?: number;
+  feedback?: string;
+  data: any;
+  created: string;
+  updated: string;
+}
+
+export interface StudentInsight {
+  id: string;
+  user: string;
+  child: string;
+  subject: string;
+  observation: string;
+  last_updated: string;
+  created: string;
+  updated: string;
+}

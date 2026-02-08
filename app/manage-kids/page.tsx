@@ -32,6 +32,7 @@ export default function ManageKidsPage() {
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
+  const [sparkLoading, setSparkLoading] = useState(false);
 
   // Derived state: Always get the latest kid data from the main list
   const selectedKid = kids.find(k => k.id === selectedKidId) || null;
@@ -491,6 +492,11 @@ export default function ManageKidsPage() {
                               <div className="flex gap-4 items-center">
                                 {mapping && <p className="text-[10px] text-text-muted mt-2 m-0 uppercase font-bold tracking-wider">Expected: Lesson {mapping.expectedLesson}</p>}
                                 {course.start_date && <p className="text-[10px] text-text-muted mt-2 m-0 uppercase font-bold tracking-wider">Started: {new Date(course.start_date).toLocaleDateString()}</p>}
+                              </div>
+                              <div className="mt-4">
+                                <Button size="sm" variant="secondary" onClick={() => generateAISpark(course)}>
+                                  🤖 Get AI Spark
+                                </Button>
                               </div>
                             </div>
                             <Button size="sm" variant={course.current_lesson > course.total_lessons ? 'ghost' : 'outline'} disabled={course.current_lesson > course.total_lessons} onClick={() => handleMarkComplete(course.id, course.current_lesson, course.total_lessons)}>
