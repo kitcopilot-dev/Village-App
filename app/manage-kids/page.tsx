@@ -246,6 +246,19 @@ export default function ManageKidsPage() {
     }
   };
 
+  const handleDeleteKid = async (kidId: string) => {
+    if (!confirm('Are you sure you want to delete this child and all their data? This cannot be undone.')) return;
+    try {
+      await pb.collection('children').delete(kidId);
+      setToast({ message: 'Child profile deleted', type: 'success' });
+      setIsKidModalOpen(false);
+      setSelectedKidId(null);
+      await loadKids();
+    } catch (error) {
+      setToast({ message: 'Failed to delete child profile', type: 'error' });
+    }
+  };
+
   const handleSaveKid = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -475,7 +488,10 @@ export default function ManageKidsPage() {
                                 </div>
                               </div>
                               <ProgressBar label={`Lesson ${course.current_lesson} of ${course.total_lessons}`} percentage={(course.current_lesson / course.total_lessons) * 100} />
-                              {mapping && <p className="text-[10px] text-text-muted mt-2 m-0">Expected: Lesson {mapping.expectedLesson}</p>}
+                              <div className="flex gap-4 items-center">
+                                {mapping && <p className="text-[10px] text-text-muted mt-2 m-0 uppercase font-bold tracking-wider">Expected: Lesson {mapping.expectedLesson}</p>}
+                                {course.start_date && <p className="text-[10px] text-text-muted mt-2 m-0 uppercase font-bold tracking-wider">Started: {new Date(course.start_date).toLocaleDateString()}</p>}
+                              </div>
                             </div>
                             <Button size="sm" variant={course.current_lesson > course.total_lessons ? 'ghost' : 'outline'} disabled={course.current_lesson > course.total_lessons} onClick={() => handleMarkComplete(course.id, course.current_lesson, course.total_lessons)}>
                               {course.current_lesson > course.total_lessons ? '✓ Done' : 'Next Lesson →'}
@@ -544,6 +560,9 @@ export default function ManageKidsPage() {
           </div>
           <Input placeholder="Current Focus" value={kidFocus} onChange={(e) => setKidFocus(e.target.value)} />
           <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
+            {editingKid && (
+              <Button type="button" variant="ghost" onClick={() => handleDeleteKid(editingKid.id)} className="text-red-500 border-red-100 hover:bg-red-50 hover:border-red-200 mr-auto w-full sm:w-auto">Delete Profile</Button>
+            )}
             <Button type="button" variant="outline" onClick={() => setIsKidModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Save Profile</Button>
           </div>
