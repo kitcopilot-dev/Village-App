@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+:root {
+  /* Village Design Tokens - Sage & Terracotta */
+  --primary: #4B6344;
+  --primary-light: #6B8E5E;
+  --primary-dark: #2D3B29;
+  --secondary: #D97757;
+  --secondary-hover: #BF5A3B;
+  --accent: #E6AF2E;
+  --accent-soft: #F4E4BA;
+  --bg: #FDFCF8;
+  --bg-alt: #F4F1EA;
+  --card-bg: #ffffff;
+  --text-main: #1A1C19;
+  --text-muted: #5C615A;
+  --border: #E0E4DC;
+  --radius-lg: 2rem;
+  --radius-md: 1.25rem;
+  --radius-sm: 0.75rem;
+  --shadow: 0 10px 30px -10px rgba(75, 99, 68, 0.12);
+  --shadow-hover: 0 20px 40px -15px rgba(75, 99, 68, 0.2);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Fraunces', serif;
+}
+
+@theme inline {
+  /* Colors */
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-card: var(--card-bg);
+  --color-text: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+
+  /* Fonts */
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-serif);
+  --font-display: var(--font-display);
+
+  /* Radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* Shadows */
+  --shadow: var(--shadow);
+  --shadow-hover: var(--shadow-hover);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+html {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(75, 99, 68, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(217, 119, 87, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Organic Background Shapes */
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%;
+  right: -10%;
+  width: 40vw;
+  height: 40vw;
+  background: var(--accent-soft);
+  filter: blur(80px);
+  z-index: -1;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: float 20s infinite ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes modalSlide {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-float {
+  animation: float 20s infinite ease-in-out;
+}
+
+.animate-modal-slide {
+  animation: modalSlide 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
