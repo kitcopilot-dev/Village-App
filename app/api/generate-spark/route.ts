@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  * It only uses data passed from the request and the PocketBase DB.
  */
 
-const OPENROUTER_API_KEY = "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";
+const OPENROUTER_API_KEY = process.env.VILLAGE_SPARK_OPENROUTER_KEY;
 
 export async function POST(req: Request) {
   try {
