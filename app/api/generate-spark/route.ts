@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server';
  * It only uses data passed from the request and the PocketBase DB.
  */
 
+const OPENROUTER_API_KEY = "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";
+
 export async function POST(req: Request) {
   try {
     const { childId, subject, courseName, gradeLevel } = await req.json();
@@ -14,45 +16,68 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required data' }, { status: 400 });
     }
 
-    // In a production environment, we would use an API Key from process.env
-    // and fetch student history/insights from PocketBase here.
-    
-    // TEMPORARY: For the prototype, we are returning a structured "Tailored" response.
-    // In the next step, we will wire this up to a real LLM call using the App's API key.
-    
-    const tailoredLesson = {
-      title: `The Wonders of ${subject}`,
-      grade_level: gradeLevel,
-      subject: subject,
-      type: 'tailored',
-      content: {
-        hook: `Welcome back! Based on your recent work in ${courseName}, today we're diving deep into ${subject}. Did you know that the patterns we see in nature often follow the same rules as the math problems you've been solving?`,
-        activity: `Go outside or look out a window. Find 3 different leaf shapes. Can you see the geometric patterns in the veins? Draw one and label the angles you find.`,
-        resources: [
-          { label: 'Watch: Nature by Numbers', url: 'https://youtube.com/...' }
-        ]
-      },
-      interactive_data: {
-        questions: [
-          {
-            id: 'q1',
-            text: `Based on your drawing, which type of angle did you see most often in the leaf veins?`,
-            type: 'multiple-choice',
-            options: ['Acute (Small)', 'Obtuse (Wide)', 'Right (L-Shape)'],
-            answer: 'Acute (Small)'
-          },
-          {
-            id: 'q2',
-            text: `How does seeing math in nature change the way you look at the world around you?`,
-            type: 'reflection'
-          }
-        ]
+    const prompt = `
+      You are an expert homeschool tutor. Generate an interactive lesson for a student in ${gradeLevel} who is studying ${subject} (Course: ${courseName}).
+      
+      Format the response as a valid JSON object with the following structure:
+      {
+        "title": "A creative title for the lesson",
+        "grade_level": "${gradeLevel}",
+        "subject": "${subject}",
+        "type": "tailored",
+        "content": {
+          "hook": "A 2-3 sentence engaging introduction or story-based 'did you know?' to spark interest.",
+          "activity": "A hands-on or simple thought activity they can do right now.",
+          "resources": [
+            { "label": "Label for a helpful resource", "url": "A real URL to a helpful video or article (use https://youtube.com for placeholders if unsure)" }
+          ]
+        },
+        "interactive_data": {
+          "questions": [
+            {
+              "id": "q1",
+              "text": "A multiple choice question about the lesson hook.",
+              "type": "multiple-choice",
+              "options": ["Option A", "Option B", "Option C", "Option D"],
+              "answer": "The correct option text exactly"
+            },
+            {
+              "id": "q2",
+              "text": "An open-ended reflection question about the activity.",
+              "type": "reflection"
+            }
+          ]
+        }
       }
-    };
+      
+      Only return the JSON object. No other text.
+    `;
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.0-flash-exp:free", // Use a free model for now
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" }
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error.message || 'AI API Error');
+    }
+
+    const content = data.choices[0].message.content;
+    const tailoredLesson = JSON.parse(content);
 
     return NextResponse.json(tailoredLesson);
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Error:', error);
-    return NextResponse.json({ error: 'Failed to generate spark' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate spark: ' + error.message }, { status: 500 });
   }
 }
