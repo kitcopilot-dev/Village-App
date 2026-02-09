@@ -531,7 +531,7 @@ export default function ManageKidsPage() {
                     {selectedKid?.courses?.map((course) => {
                       const mapping = schoolYear ? getExpectedLesson(course, schoolYear, breaks) : null;
                       return (
-                        <div key={course.id} className="bg-card p-6 rounded-[1.25rem] border border-border group">
+                        <Card key={course.id} className="p-6 group border-border/50 hover:border-primary/30 shadow-sm">
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex-1 mr-4">
                               <div className="flex items-center gap-3 mb-1">
@@ -542,8 +542,8 @@ export default function ManageKidsPage() {
                                   </span>
                                 )}
                                 <div className="flex gap-2 ml-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                  <button onClick={() => openCourseModal(course)} className="text-text-muted hover:text-primary">✏️</button>
-                                  <button onClick={() => handleDeleteCourse(course.id)} className="text-text-muted hover:text-red-500">🗑️</button>
+                                  <button onClick={() => openCourseModal(course)} className="text-text-muted hover:text-primary transition-colors">✏️</button>
+                                  <button onClick={() => handleDeleteCourse(course.id)} className="text-text-muted hover:text-red-500 transition-colors">🗑️</button>
                                 </div>
                               </div>
                               <ProgressBar label={`Lesson ${course.current_lesson} of ${course.total_lessons}`} percentage={(course.current_lesson / course.total_lessons) * 100} />
@@ -561,7 +561,7 @@ export default function ManageKidsPage() {
                               {course.current_lesson > course.total_lessons ? '✓ Done' : 'Next Lesson →'}
                             </Button>
                           </div>
-                        </div>
+                        </Card>
                       );
                     })}
                   </div>
