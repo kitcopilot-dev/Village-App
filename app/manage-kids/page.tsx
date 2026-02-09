@@ -384,6 +384,7 @@ export default function ManageKidsPage() {
       if (!response.ok) throw new Error('API call failed');
       
       const lessonData = await response.json();
+      console.log('AI Lesson Data:', lessonData);
 
       // Save the newly generated lesson to PocketBase
       const newLesson = await pb.collection('lessons').create({
