@@ -44,6 +44,7 @@ export default function ManageKidsPage() {
   const [kidAge, setKidAge] = useState('');
   const [kidGrade, setKidGrade] = useState('Kindergarten');
   const [kidFocus, setKidFocus] = useState('');
+  const [kidPin, setKidPin] = useState('1234');
   
   const [courseName, setCourseName] = useState('');
   const [totalLessons, setTotalLessons] = useState('180');
@@ -197,12 +198,14 @@ export default function ManageKidsPage() {
       setKidAge(kid.age.toString());
       setKidGrade(kid.grade || 'Kindergarten');
       setKidFocus(kid.focus || '');
+      setKidPin((kid as any).pin || '1234');
     } else {
       setEditingKid(null);
       setKidName('');
       setKidAge('');
       setKidGrade('Kindergarten');
       setKidFocus('');
+      setKidPin('1234');
     }
     setIsKidModalOpen(true);
   };
@@ -274,7 +277,7 @@ export default function ManageKidsPage() {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
 
-      const data = { user: userId, name: kidName, age: parseInt(kidAge), grade: kidGrade, focus: kidFocus };
+      const data = { user: userId, name: kidName, age: parseInt(kidAge), grade: kidGrade, focus: kidFocus, pin: kidPin };
 
       if (editingKid) {
         await pb.collection('children').update(editingKid.id, data);
@@ -661,6 +664,18 @@ export default function ManageKidsPage() {
             </Select>
           </div>
           <Input placeholder="Current Focus" value={kidFocus} onChange={(e) => setKidFocus(e.target.value)} />
+          <div className="bg-bg-alt p-6 rounded-2xl border border-border mt-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Student Access PIN</p>
+            <p className="text-[10px] text-text-muted mb-4 italic">A 4-digit code for your child to log in at /student</p>
+            <Input 
+              type="text" 
+              maxLength={4} 
+              placeholder="e.g. 1234" 
+              value={kidPin} 
+              onChange={(e) => setKidPin(e.target.value.replace(/\D/g, ''))} 
+              className="text-center font-display text-2xl tracking-[0.5em]"
+            />
+          </div>
           <div className="flex flex-col sm:flex-row justify-end gap-6 mt-12">
             {editingKid && (
               <Button type="button" variant="ghost" onClick={() => handleDeleteKid(editingKid.id)} className="text-red-500 border-red-100 hover:bg-red-50 hover:border-red-200 mr-auto w-full sm:w-auto">Delete Profile</Button>

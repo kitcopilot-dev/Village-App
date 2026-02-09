@@ -96,6 +96,9 @@ export default function Home() {
             <Button size="lg" onClick={() => document.getElementById('join')?.scrollIntoView({ behavior: 'smooth' })}>
               Start Your Village
             </Button>
+            <Button variant="ghost" size="lg" onClick={() => router.push('/student')}>
+              Student Login
+            </Button>
             <Button variant="outline" size="lg" onClick={navigateToLegalGuides}>
               Explore Legal Guides
             </Button>
