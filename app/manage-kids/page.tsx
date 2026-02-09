@@ -53,6 +53,7 @@ export default function ManageKidsPage() {
 
   const [portfolioTitle, setPortfolioTitle] = useState('');
   const [portfolioSubject, setPortfolioSubject] = useState('');
+  const [portfolioDescription, setPortfolioDescription] = useState('');
   const [portfolioFile, setPortfolioFile] = useState<File | null>(null);
 
   const toggleDay = (day: string) => {
@@ -155,6 +156,7 @@ export default function ManageKidsPage() {
       formData.append('child', selectedKidId);
       formData.append('title', portfolioTitle);
       formData.append('subject', portfolioSubject);
+      formData.append('description', portfolioDescription);
       formData.append('date', new Date().toISOString());
       if (portfolioFile) {
         formData.append('image', portfolioFile);
@@ -179,6 +181,7 @@ export default function ManageKidsPage() {
       setIsPortfolioModalOpen(false);
       setPortfolioTitle('');
       setPortfolioSubject('');
+      setPortfolioDescription('');
       setPortfolioFile(null);
       loadPortfolio(selectedKidId);
     } catch (error) {
@@ -687,6 +690,7 @@ export default function ManageKidsPage() {
         <form onSubmit={handleSavePortfolio} className="space-y-4">
           <Input placeholder="Project Title" value={portfolioTitle} onChange={(e) => setPortfolioTitle(e.target.value)} required />
           <Input placeholder="Subject" value={portfolioSubject} onChange={(e) => setPortfolioSubject(e.target.value)} />
+          <Textarea label="Notes (What was learned?)" value={portfolioDescription} onChange={(e) => setPortfolioDescription(e.target.value)} placeholder="e.g. Practiced stage presence and applied creative makeup for a role." />
           <div className="mt-4">
             <label className="block text-sm font-bold text-primary mb-2">Photo / Work Sample</label>
             <input type="file" accept="image/*,.pdf" onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)} className="block w-full text-sm text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white" />
