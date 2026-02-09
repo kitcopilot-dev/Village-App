@@ -289,6 +289,9 @@ export default function DashboardPage() {
                           <div>
                             <div className="flex items-center gap-2">
                               <h4 className="font-display font-bold m-0">{kid.name}</h4>
+                              <span className="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-bg-alt text-primary-dark">
+                                {kid.grade}
+                              </span>
                               {behindCount > 0 && (
                                 <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-red-100 text-red-700">
                                   ⚠️ {behindCount} {behindCount === 1 ? 'Subject' : 'Subjects'} Behind

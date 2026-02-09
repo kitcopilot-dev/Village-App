@@ -48,6 +48,7 @@ export default function ManageKidsPage() {
   const [courseName, setCourseName] = useState('');
   const [totalLessons, setTotalLessons] = useState('180');
   const [currentLesson, setCurrentLesson] = useState('1');
+  const [courseGrade, setCourseGrade] = useState('Kindergarten');
   const [courseStartDate, setCourseStartDate] = useState('');
   const [activeDays, setActiveDays] = useState(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
 
@@ -212,6 +213,7 @@ export default function ManageKidsPage() {
       setCourseName(course.name);
       setTotalLessons(course.total_lessons.toString());
       setCurrentLesson(course.current_lesson.toString());
+      setCourseGrade(course.grade_level || 'Kindergarten');
       setCourseStartDate(course.start_date ? new Date(course.start_date).toISOString().split('T')[0] : '');
       
       if (typeof course.active_days === 'string') {
@@ -235,6 +237,7 @@ export default function ManageKidsPage() {
       setCourseName('');
       setTotalLessons('180');
       setCurrentLesson('1');
+      setCourseGrade('Kindergarten');
       setCourseStartDate(new Date().toISOString().split('T')[0]);
       setActiveDays(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
     }
@@ -299,6 +302,7 @@ export default function ManageKidsPage() {
         name: courseName,
         total_lessons: parseInt(totalLessons),
         current_lesson: parseInt(currentLesson),
+        grade_level: courseGrade,
         start_date: courseStartDate ? new Date(courseStartDate).toISOString() : undefined,
         active_days: activeDays.join(',')
       };
@@ -601,7 +605,7 @@ export default function ManageKidsPage() {
                   const images = Array.isArray(item.image) ? item.image : [item.image].filter(Boolean);
                   return (
                   <div key={item.id} className="bg-white rounded-[1.25rem] overflow-hidden border border-border shadow-sm">
-                    <div className="h-36 bg-bg-alt bg-cover bg-center flex items-center justify-center text-5xl" style={{ backgroundImage: images[0] ? `url(${pb.files.getUrl(item as any, images[0])})` : 'none' }}>
+                    <div className="h-36 bg-bg-alt bg-cover bg-center flex items-center justify-center text-5xl" style={{ backgroundImage: images[0] ? `url(${pb.files.getURL(item as any, images[0])})` : 'none' }}>
                       {images.length === 0 && '🎨'}
                     </div>
                     <div className="p-6">
@@ -674,6 +678,9 @@ export default function ManageKidsPage() {
             <Input type="number" label="Total Lessons" value={totalLessons} onChange={(e) => setTotalLessons(e.target.value)} required />
             <Input type="number" label="Current Lesson" value={currentLesson} onChange={(e) => setCurrentLesson(e.target.value)} required />
           </div>
+          <Select label="Subject Grade Level" value={courseGrade} onChange={(e) => setCourseGrade(e.target.value)}>
+            <option>Preschool</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>High School</option>
+          </Select>
           <Input type="date" label="Course Start Date" value={courseStartDate} onChange={(e) => setCourseStartDate(e.target.value)} />
           <div className="mt-6">
             <p className="text-sm font-bold text-primary mb-3">Active Days</p>

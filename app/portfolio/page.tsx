@@ -178,7 +178,7 @@ export default function PortfolioPage() {
   }, {} as Record<string, PortfolioItem[]>);
 
   const getImageUrl = (item: PortfolioItem, fileName: string) => {
-    return pb.files.getUrl(item as any, fileName);
+    return pb.files.getURL(item as any, fileName);
   };
 
   if (loading) return <LoadingScreen message="Loading portfolio..." />;
