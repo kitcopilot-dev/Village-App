@@ -596,17 +596,20 @@ export default function ManageKidsPage() {
                   <span className="text-4xl">➕</span>
                   <span className="text-sm font-bold text-primary">Add Project</span>
                 </div>
-                {portfolioItems.map((item) => (
+                    {portfolioItems.map((item) => {
+                  const images = Array.isArray(item.image) ? item.image : [item.image].filter(Boolean);
+                  return (
                   <div key={item.id} className="bg-white rounded-[1.25rem] overflow-hidden border border-border shadow-sm">
-                    <div className="h-36 bg-bg-alt bg-cover bg-center flex items-center justify-center text-5xl" style={{ backgroundImage: item.image ? `url(${pb.files.getUrl(item as any, item.image)})` : 'none' }}>
-                      {!item.image && '🎨'}
+                    <div className="h-36 bg-bg-alt bg-cover bg-center flex items-center justify-center text-5xl" style={{ backgroundImage: images[0] ? `url(${pb.files.getUrl(item as any, images[0])})` : 'none' }}>
+                      {images.length === 0 && '🎨'}
                     </div>
                     <div className="p-6">
                       <h5 className="m-0 font-display text-base">{item.title}</h5>
                       <p className="text-xs mt-2 text-text-muted">{item.subject || 'General'} • {new Date(item.date).toLocaleDateString()}</p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
