@@ -72,7 +72,7 @@ export default function MapPage() {
       mapRef.current = L.map(mapContainerRef.current).setView(initialView, zoom);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(mapRef.current);
 
       // Add markers
@@ -82,10 +82,10 @@ export default function MapPage() {
           const marker = L.marker([p.profile_latitude, p.profile_longitude])
             .addTo(mapRef.current)
             .bindPopup(`
-              <div style=\"padding: 10px;\">
-                <strong style=\"display: block; font-size: 14px; margin-bottom: 4px;\">${p.family_name}</strong>
-                <span style=\"color: #5C615A; font-size: 12px;\">📍 ${p.location}</span>
-                ${p.children_ages ? `<p style=\"margin-top: 8px; font-size: 11px;\">👥 Kids ages: ${p.children_ages}</p>` : ''}
+              <div style="padding: 10px;">
+                <strong style="display: block; font-size: 14px; margin-bottom: 4px;">${p.family_name}</strong>
+                <span style="color: #5C615A; font-size: 12px;">📍 ${p.location}</span>
+                ${p.children_ages ? `<p style="margin-top: 8px; font-size: 11px;">👥 Kids ages: ${p.children_ages}</p>` : ''}
               </div>
             `);
           markers.push(marker);

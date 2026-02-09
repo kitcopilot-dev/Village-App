@@ -270,7 +270,7 @@ export default function ProfilePage() {
                 <h4 className="font-display font-bold text-lg mb-2 text-primary">🤖 Village Assistant Bot</h4>
                 <p className="text-xs text-text-muted mb-4 leading-relaxed">
                   Enter your Telegram ID below to allow the Village Assistant bot to recognize you. 
-                  You can find your ID by messaging <a href=\"https://t.me/userinfobot\" target=\"_blank\" className=\"text-secondary underline\">@userinfobot</a>.
+                  You can find your ID by messaging <a href="https://t.me/userinfobot" target="_blank" className="text-secondary underline">@userinfobot</a>.
                 </p>
                 <Input
                   placeholder="Your Telegram ID (e.g., 123456789)"

@@ -42,6 +42,7 @@ export default function CalendarPage() {
   const [isYearModalOpen, setIsYearModalOpen] = useState(false);
   const [isBreakModalOpen, setIsBreakModalOpen] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [activeDays, setActiveDays] = useState(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
 
   // Form states
   const [yearName, setYearName] = useState('');
@@ -174,10 +175,14 @@ export default function CalendarPage() {
     const end = new Date(selectedYear.end_date);
     let schoolDays = 0;
 
+    const dayMap: Record<number, string> = { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 0: 'Sun' };
+
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const dayOfWeek = d.getDay();
-      // Skip weekends
-      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+      const dayName = dayMap[dayOfWeek];
+      
+      // Skip if not an active day
+      if (!activeDays.includes(dayName)) continue;
       
       // Check if in any break
       const isBreak = breaks.some(b => {
@@ -247,6 +252,24 @@ export default function CalendarPage() {
                     ))}
                   </select>
                 )}
+              </div>
+            </Card>
+
+            {/* Active Days for Year (New) */}
+            <Card className="mb-8 p-6">
+              <h3 className="font-display font-bold text-lg mb-4 text-primary">Academic Weekdays</h3>
+              <p className="text-sm text-text-muted mb-6 italic font-serif">Which days of the week does your village hold school sessions?</p>
+              <div className="flex flex-wrap gap-2">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                  <button 
+                    key={day} 
+                    type="button" 
+                    onClick={() => setActiveDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day])}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all ${activeDays.includes(day) ? 'bg-primary text-white border-primary shadow-md' : 'bg-bg-alt text-text-muted border-border'}`}
+                  >
+                    {day}
+                  </button>
+                ))}
               </div>
             </Card>
 
