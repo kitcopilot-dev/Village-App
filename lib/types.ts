@@ -93,7 +93,7 @@ export interface PortfolioItem {
   child: string;
   title: string;
   subject?: string;
-  image: string; // URL or File ID
+  image: string | string[]; // URL(s) or File ID(s)
   description?: string;
   date: string;
   created: string;

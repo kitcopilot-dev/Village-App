@@ -30,6 +30,7 @@ export default function PortfolioPage() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   // Form states
@@ -38,8 +39,8 @@ export default function PortfolioPage() {
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   // Filters
   const [filterChild, setFilterChild] = useState('all');
@@ -83,17 +84,23 @@ export default function PortfolioPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setImageFile(file);
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
-    }
+    const files = Array.from(e.target.files || []);
+    setImageFiles(prev => [...prev, ...files]);
+    
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -109,9 +116,10 @@ export default function PortfolioPage() {
       formData.append('subject', subject);
       formData.append('date', new Date(date).toISOString());
       formData.append('description', description);
-      if (imageFile) {
-        formData.append('image', imageFile);
-      }
+      
+      imageFiles.forEach(file => {
+        formData.append('image', file);
+      });
 
       await pb.collection('portfolio').create(formData);
 
@@ -152,8 +160,8 @@ export default function PortfolioPage() {
     setSubject(SUBJECTS[0]);
     setDate(new Date().toISOString().split('T')[0]);
     setDescription('');
-    setImageFile(null);
-    setImagePreview(null);
+    setImageFiles([]);
+    setImagePreviews([]);
   };
 
   const filteredItems = items.filter(i => {
@@ -168,6 +176,10 @@ export default function PortfolioPage() {
     acc[s].push(item);
     return acc;
   }, {} as Record<string, PortfolioItem[]>);
+
+  const getImageUrl = (item: PortfolioItem, fileName: string) => {
+    return pb.files.getUrl(item as any, fileName);
+  };
 
   if (loading) return <LoadingScreen message="Loading portfolio..." />;
 
@@ -219,40 +231,66 @@ export default function PortfolioPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {subjItems.map((item) => (
-                    <Card key={item.id} className="p-0 overflow-hidden group border-border/50 hover:border-primary/30 shadow-sm">
-                      <div className="relative aspect-[4/3] bg-bg-alt overflow-hidden">
-                        {item.image ? (
-                          <img 
-                            src={pb.files.getUrl(item as any, item.image)} 
-                            alt={item.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🎨</div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                           <button onClick={() => handleDelete(item.id)} className="w-12 h-12 rounded-full bg-white text-red-500 flex items-center justify-center hover:scale-110 transition-transform">🗑️</button>
+                  {subjItems.map((item) => {
+                    const images = Array.isArray(item.image) ? item.image : [item.image].filter(Boolean);
+                    return (
+                      <Card key={item.id} className="p-0 overflow-hidden group border-border/50 hover:border-primary/30 shadow-sm relative">
+                        {/* Delete Button - Moved to top right */}
+                        <button 
+                          onClick={() => handleDelete(item.id)} 
+                          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/90 shadow-md text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                        >
+                          🗑️
+                        </button>
+
+                        <div className="relative aspect-[4/3] bg-bg-alt overflow-hidden cursor-pointer" onClick={() => images[0] && setZoomImage(getImageUrl(item, images[0]))}>
+                          {images.length > 0 ? (
+                            <>
+                              <img 
+                                src={getImageUrl(item, images[0])} 
+                                alt={item.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              />
+                              {images.length > 1 && (
+                                <div className="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-full backdrop-blur-sm">
+                                  +{images.length - 1} more
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🎨</div>
+                          )}
                         </div>
-                      </div>
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-display text-lg font-bold m-0 leading-tight">{item.title}</h4>
-                        </div>
-                        <p className="text-xs text-text-muted mb-4 uppercase font-bold tracking-wider">
-                          🧒 {kids.find(k => k.id === item.child)?.name || 'Unknown Student'}
-                        </p>
-                        {item.description && (
-                          <p className="text-sm text-text-muted line-clamp-2 mb-4 italic">
-                            &ldquo;{item.description}&rdquo;
+                        <div className="p-6">
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-display text-lg font-bold m-0 leading-tight">{item.title}</h4>
+                          </div>
+                          <p className="text-xs text-text-muted mb-4 uppercase font-bold tracking-wider">
+                            🧒 {kids.find(k => k.id === item.child)?.name || 'Unknown Student'}
                           </p>
-                        )}
-                        <p className="text-[10px] text-text-muted/60 m-0 font-bold uppercase tracking-widest">
-                          {new Date(item.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                        </p>
-                      </div>
-                    </Card>
-                  ))}
+                          {item.description && (
+                            <p className="text-sm text-text-muted line-clamp-2 mb-4 italic">
+                              &ldquo;{item.description}&rdquo;
+                            </p>
+                          )}
+                          <div className="flex justify-between items-center mt-auto">
+                             <p className="text-[10px] text-text-muted/60 m-0 font-bold uppercase tracking-widest">
+                              {new Date(item.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            </p>
+                            {images.length > 1 && (
+                              <div className="flex gap-1 overflow-hidden">
+                                {images.slice(1, 4).map((img, idx) => (
+                                  <div key={idx} className="w-6 h-6 rounded-md overflow-hidden border border-border" onClick={(e) => { e.stopPropagation(); setZoomImage(getImageUrl(item, img)); }}>
+                                    <img src={getImageUrl(item, img)} alt="" className="w-full h-full object-cover" />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -281,18 +319,31 @@ export default function PortfolioPage() {
             <Input label="Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
             <div className="mb-5">
               <label className="block text-[10px] sm:text-xs font-bold mb-1.5 sm:mb-2 uppercase tracking-wide text-primary">
-                Photo / Document
+                Photos / Documents
               </label>
               <div className="flex flex-col gap-4">
                 <input 
                   type="file" 
                   accept="image/*,.pdf" 
+                  multiple
                   onChange={handleFileChange}
                   className="w-full text-xs text-text-muted file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-white"
                 />
-                {imagePreview && (
-                  <div className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-border shadow-sm animate-fade-in">
-                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {imagePreviews.map((prev, i) => (
+                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border shadow-sm group">
+                        <img src={prev} alt="" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => removeFile(i)}
+                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -306,6 +357,22 @@ export default function PortfolioPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Lightbox / Zoom Modal */}
+      {zoomImage && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 sm:p-20"
+          onClick={() => setZoomImage(null)}
+        >
+          <button className="absolute top-8 right-8 text-white text-4xl hover:scale-110 transition-transform">✕</button>
+          <img 
+            src={zoomImage} 
+            alt="Zoomed Work Sample" 
+            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </>
