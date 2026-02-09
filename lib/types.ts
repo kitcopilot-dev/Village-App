@@ -16,6 +16,7 @@ export interface Profile {
   children_ages?: string;
   profile_latitude?: number;
   profile_longitude?: number;
+  telegram_id?: string;
   created: string;
   updated: string;
 }

@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [editFamilyName, setEditFamilyName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editLocation, setEditLocation] = useState('');
+  const [editTelegramId, setEditTelegramId] = useState('');
   const [editLat, setEditLat] = useState<number | undefined>(undefined);
   const [editLon, setEditLon] = useState<number | undefined>(undefined);
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -41,6 +42,7 @@ export default function ProfilePage() {
       setEditFamilyName(prof.family_name || '');
       setEditDescription(prof.description || '');
       setEditLocation(prof.location || '');
+      setEditTelegramId(prof.telegram_id || '');
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
       setEditChildrenAges(prof.children_ages || '');
@@ -68,6 +70,7 @@ export default function ProfilePage() {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
+        telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
         children_ages: editChildrenAges
@@ -79,6 +82,7 @@ export default function ProfilePage() {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
+        telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
         children_ages: editChildrenAges
@@ -184,6 +188,12 @@ export default function ProfilePage() {
                   <strong className="text-primary">Kids&apos; Ages:</strong>{' '}
                   <span className="text-text-muted">{profile.children_ages || 'None listed'}</span>
                 </p>
+                {profile.telegram_id && (
+                  <p className="mb-4">
+                    <strong className="text-primary">Telegram:</strong>{' '}
+                    <span className="text-text-muted">Connected ({profile.telegram_id})</span>
+                  </p>
+                )}
               </div>
 
               <div className="flex-1 min-w-[280px] grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
@@ -255,6 +265,20 @@ export default function ProfilePage() {
                 value={editChildrenAges}
                 onChange={(e) => setEditChildrenAges(e.target.value)}
               />
+              
+              <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
+                <h4 className="font-display font-bold text-lg mb-2 text-primary">🤖 Village Assistant Bot</h4>
+                <p className="text-xs text-text-muted mb-4 leading-relaxed">
+                  Enter your Telegram ID below to allow the Village Assistant bot to recognize you. 
+                  You can find your ID by messaging <a href=\"https://t.me/userinfobot\" target=\"_blank\" className=\"text-secondary underline\">@userinfobot</a>.
+                </p>
+                <Input
+                  placeholder="Your Telegram ID (e.g., 123456789)"
+                  value={editTelegramId}
+                  onChange={(e) => setEditTelegramId(e.target.value)}
+                  className="mb-0"
+                />
+              </div>
               
               {message && (
                 <p className={`mb-4 ${message.startsWith('✓') ? 'text-green-600' : 'text-red-600'}`}>
