@@ -26,3 +26,11 @@ The `user` field's `options.collectionId` was changed from `"users"` to `"_pb_us
 2. Converted `date` from Date to Text.
 
 This bypasses strict PocketBase validation that was causing the save to fail.
+
+## 2026-02-09: Fixed portfolio student name and mobile delete button
+
+**Issue:** Student names were showing as "Unknown Student" and delete buttons were hidden on mobile.
+
+**Fix Applied:** 
+1. Manually mapped student names from the `kids` state instead of relying on PocketBase `expand` (which failed due to loosened schema).
+2. Changed delete button opacity to `opacity-100` on mobile so they are always visible.

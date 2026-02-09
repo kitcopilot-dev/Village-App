@@ -231,7 +231,7 @@ export default function PortfolioPage() {
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">🎨</div>
                         )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                        <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                            <button onClick={() => handleDelete(item.id)} className="w-12 h-12 rounded-full bg-white text-red-500 flex items-center justify-center hover:scale-110 transition-transform">🗑️</button>
                         </div>
                       </div>
@@ -240,7 +240,7 @@ export default function PortfolioPage() {
                           <h4 className="font-display text-lg font-bold m-0 leading-tight">{item.title}</h4>
                         </div>
                         <p className="text-xs text-text-muted mb-4 uppercase font-bold tracking-wider">
-                          🧒 {(item as any).expand?.child?.name || 'Unknown Student'}
+                          🧒 {kids.find(k => k.id === item.child)?.name || 'Unknown Student'}
                         </p>
                         {item.description && (
                           <p className="text-sm text-text-muted line-clamp-2 mb-4 italic">
