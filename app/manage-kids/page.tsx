@@ -13,6 +13,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
+import { ClientOnly } from '@/components/ui/ClientOnly';
 
 export default function ManageKidsPage() {
   const router = useRouter();
@@ -476,7 +477,8 @@ export default function ManageKidsPage() {
   return (
     <>
       <Header showLogout onLogout={handleLogout} />
-      <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
+      <ClientOnly>
+        <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
         {!selectedKidId ? (
           <div>
             <div className="flex justify-between items-center mb-12 flex-wrap gap-4">
@@ -652,7 +654,7 @@ export default function ManageKidsPage() {
             )}
           </div>
         )}
-      </main>
+      </ClientOnly>
 
       <Modal isOpen={isKidModalOpen} onClose={() => setIsKidModalOpen(false)} title={editingKid ? 'Edit Child' : 'Add a Child'} subtitle="Enter details to personalize their learning experience.">
         <form onSubmit={handleSaveKid} className="space-y-4">

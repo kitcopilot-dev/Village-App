@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
+import { ClientOnly } from '@/components/ui/ClientOnly';
 
 interface ChildWithCourses extends Child {
   courses: Course[];
@@ -210,7 +211,8 @@ export default function DashboardPage() {
   return (
     <>
       <Header showLogout onLogout={handleLogout} />
-      <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
+      <ClientOnly>
+        <main className="max-w-7xl mx-auto my-12 px-8 pb-20 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-0">Family Dashboard</h2>
           <div className="flex gap-3 flex-wrap">
@@ -486,7 +488,7 @@ export default function DashboardPage() {
             </Card>
           </>
         )}
-      </main>
+      </ClientOnly>
     </>
   );
 }
