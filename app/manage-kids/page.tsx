@@ -395,9 +395,9 @@ export default function ManageKidsPage() {
 
       setToast({ message: 'Tailored lesson generated!', type: 'success' });
       router.push(`/lessons/${newLesson.id}`);
-    } catch (e) {
+    } catch (e: any) {
       console.error('AI Spark error:', e);
-      setToast({ message: 'AI Spark failed to ignite.', type: 'error' });
+      setToast({ message: `AI Spark failed to ignite: ${e.message}`, type: 'error' });
     } finally {
       setSparkLoading(false);
     }
