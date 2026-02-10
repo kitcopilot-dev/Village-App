@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-exp:free", // Use a free model for now
+        model: "openrouter/free", // Auto-selects from available free models
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" }
       })
@@ -68,11 +68,19 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     
+    console.log('OpenRouter response:', JSON.stringify(data, null, 2));
+    
     if (data.error) {
       throw new Error(data.error.message || 'AI API Error');
     }
 
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid API response structure');
+    }
+
     const content = data.choices[0].message.content;
+    console.log('AI generated content:', content);
+    
     const tailoredLesson = JSON.parse(content);
 
     return NextResponse.json(tailoredLesson);

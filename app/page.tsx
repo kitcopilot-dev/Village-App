@@ -10,7 +10,8 @@ import { Card } from '@/components/ui/Card';
 
 export default function Home() {
   const router = useRouter();
-  const pb = getPocketBase();
+  const [mounted, setMounted] = useState(false);
+  const [pb, setPb] = useState<any>(null);
   
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -22,14 +23,20 @@ export default function Home() {
   const [registerMessage, setRegisterMessage] = useState('');
 
   useEffect(() => {
+    setMounted(true);
+    // Initialize PocketBase client-side only
+    const pocketbase = getPocketBase();
+    setPb(pocketbase);
+    
     // Check if already logged in
-    if (pb.authStore.isValid) {
+    if (pocketbase.authStore.isValid) {
       router.push('/profile');
     }
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!pb) return;
     setLoginMessage('');
     
     try {
@@ -43,6 +50,7 @@ export default function Home() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!pb) return;
     setRegisterMessage('');
 
     if (registerPassword !== registerConfirmPassword) {
@@ -77,6 +85,17 @@ export default function Home() {
   const navigateToLegalGuides = () => {
     router.push('/legal-guides');
   };
+
+  if (!mounted || !pb) {
+    return (
+      <>
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-8 pb-24 text-center pt-20">
+          <p className="text-text-muted">Loading...</p>
+        </main>
+      </>
+    );
+  }
 
   return (
     <>
