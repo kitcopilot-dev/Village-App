@@ -176,6 +176,11 @@ export default function ProfilePage() {
                   <strong className="text-primary">Family:</strong>{' '}
                   <span className="font-serif text-2xl text-primary">{profile.family_name}</span>
                 </p>
+                <p className=mb-4>
+                  <strong className=text-primary>Family Code:</strong>{' '}
+                  <span className=font-mono text-2xl text-secondary font-bold tracking-widest>{profile.family_code || 'Not set'}</span>
+                  <span className=block text-xs text-text-muted mt-1>Share this code with your students for login</span>
+                </p>
                 <p className="mb-4">
                   <strong className="text-primary">About:</strong>{' '}
                   <span className="text-text-muted">{profile.description || 'No description provided.'}</span>

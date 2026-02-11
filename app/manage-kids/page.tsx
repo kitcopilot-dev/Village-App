@@ -216,7 +216,16 @@ export default function ManageKidsPage() {
     try {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
-      const data = { user: userId, name: kidName, age: parseInt(kidAge), grade: kidGrade, focus: kidFocus, pin: kidPin };
+      const profile = pb.authStore.model as any;
+      const data = { 
+        user: userId, 
+        name: kidName, 
+        age: parseInt(kidAge), 
+        grade: kidGrade, 
+        focus: kidFocus, 
+        pin: kidPin,
+        family_code: profile?.family_code || ''
+      };
       if (editingKid) {
         await pb.collection('children').update(editingKid.id, data);
       } else {

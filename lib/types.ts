@@ -20,6 +20,7 @@ export interface Profile {
   created: string;
   updated: string;
   profile_complete?: boolean;
+  family_code?: string;
 }
 
 export interface Child {
@@ -32,6 +33,7 @@ export interface Child {
   created: string;
   updated: string;
   courses?: Course[];
+  family_code?: string;
 }
 
 export interface Course {

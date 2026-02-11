@@ -14,24 +14,39 @@ export default function StudentLoginPage() {
   
   const [kids, setKids] = useState<Child[]>([]);
   const [selectedKid, setSelectedKid] = useState<Child | null>(null);
+  const [familyCode, setFamilyCode] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showKids, setShowKids] = useState(false);
 
-  useEffect(() => {
-    loadPublicKids();
-  }, []);
+  const loadFamilyKids = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!familyCode.trim()) {
+      setError('Please enter your family code');
+      return;
+    }
 
-  const loadPublicKids = async () => {
+    setLoading(true);
+    setError('');
     try {
-      // In a real app, we'd use a search or a shared family link.
-      // For now, we'll list all kids (discovery mode).
+      // Query kids with matching family code
       const records = await pb.collection('children').getFullList({
+        filter: `family_code = "${familyCode.toUpperCase()}"`,
         sort: 'name'
       });
+      
+      if (records.length === 0) {
+        setError('No students found with that family code. Check your code and try again.');
+        setLoading(false);
+        return;
+      }
+      
       setKids(records as unknown as Child[]);
-    } catch (e) {
+      setShowKids(true);
+    } catch (e: any) {
       console.error('Failed to load kids:', e);
+      setError('Could not load students. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -50,7 +65,14 @@ export default function StudentLoginPage() {
     }
   };
 
-  if (loading) return <div className="p-20 text-center">Finding your Village...</div>;
+  const handleBack = () => {
+    setSelectedKid(null);
+    setShowKids(false);
+    setKids([]);
+    setFamilyCode('');
+    setError('');
+    setPin('');
+  };
 
   return (
     <main className="min-h-screen bg-bg flex items-center justify-center p-8 animate-fade-in">
@@ -58,8 +80,32 @@ export default function StudentLoginPage() {
         <h1 className="font-display text-4xl font-extrabold text-primary mb-2">Student Login</h1>
         <p className="text-text-muted mb-12 italic font-serif">Welcome back, explorer!</p>
 
-        {!selectedKid ? (
-          <div className="grid grid-cols-1 gap-4">
+        {!showKids && !selectedKid && (
+          <form onSubmit={loadFamilyKids} className="space-y-8 animate-fade-in">
+            <div>
+              <p className="text-sm font-bold text-text-muted uppercase tracking-widest mb-4">Enter Your Family Code</p>
+              <Input
+                type="text"
+                value={familyCode}
+                onChange={(e) => setFamilyCode(e.target.value.toUpperCase())}
+                placeholder="e.g. SMITH2024"
+                maxLength={12}
+                className="text-center text-2xl tracking-widest font-display uppercase"
+                autoFocus
+              />
+              <p className="text-xs text-text-muted mt-2">Ask your parent for your family code</p>
+            </div>
+
+            {error && <p className="text-red-500 font-bold animate-bounce">{error}</p>}
+
+            <Button type="submit" className="w-full" disabled={loading || familyCode.length < 6}>
+              {loading ? 'Looking for your family...' : 'Continue'}
+            </Button>
+          </form>
+        )}
+
+        {showKids && !selectedKid && (
+          <div className="grid grid-cols-1 gap-4 animate-fade-in">
             <p className="text-sm font-bold text-text-muted uppercase tracking-widest mb-4">Who are you today?</p>
             {kids.map(kid => (
               <button
@@ -71,8 +117,11 @@ export default function StudentLoginPage() {
                 {kid.name}
               </button>
             ))}
+            <Button variant="ghost" onClick={handleBack} className="mt-4">Use Different Code</Button>
           </div>
-        ) : (
+        )}
+
+        {selectedKid && (
           <form onSubmit={handleLogin} className="space-y-8 animate-fade-in">
             <div>
               <p className="text-xl font-bold mb-2">Hi {selectedKid.name}!</p>
@@ -94,7 +143,7 @@ export default function StudentLoginPage() {
             {error && <p className="text-red-500 font-bold animate-bounce">{error}</p>}
 
             <div className="flex gap-4">
-              <Button variant="outline" className="flex-1" onClick={() => { setSelectedKid(null); setError(''); }}>Back</Button>
+              <Button variant="outline" className="flex-1" onClick={handleBack}>Back</Button>
               <Button type="submit" className="flex-1" disabled={pin.length < 4}>Enter</Button>
             </div>
           </form>
