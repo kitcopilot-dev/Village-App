@@ -1,0 +1,41 @@
+
+> village-v2@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 9.0s
+  Running TypeScript ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/19) ...
+  Generating static pages using 1 worker (4/19) 
+  Generating static pages using 1 worker (9/19) 
+  Generating static pages using 1 worker (14/19) 
+✓ Generating static pages using 1 worker (19/19) in 413.7ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin
+├ ƒ /api/generate-spark
+├ ○ /assignments
+├ ○ /attendance
+├ ○ /calendar
+├ ○ /dashboard
+├ ○ /events
+├ ○ /legal-guides
+├ ƒ /lessons/[id]
+├ ○ /manage-kids
+├ ○ /map
+├ ○ /portfolio
+├ ○ /profile
+├ ○ /student
+├ ○ /student/dashboard
+└ ○ /transcript
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

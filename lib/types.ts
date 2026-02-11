@@ -62,35 +62,21 @@ export interface ActivityLog {
 
 export interface Event {
   id: string;
-  user: string;
+  creator: string;
   title: string;
   description: string;
-  date: string;
-  time: string;
+  event_date: string;
+  event_time: string;
   location: string;
   age_suitability?: string;
   max_capacity?: number;
-  supplies?: string; // JSON string
+  latitude?: number;
+  longitude?: number;
   created: string;
   updated: string;
   expand?: {
-    user?: User;
+    creator?: Profile;
   };
-}
-
-export interface Assignment {
-  id: string;
-  user: string;
-  child?: string;
-  title: string;
-  description?: string;
-  subject?: string;
-  due_date: string;
-  status?: string;
-  score?: number;
-  event_link?: string;
-  created: string;
-  updated: string;
 }
 
 export interface PortfolioItem {

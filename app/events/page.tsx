@@ -49,8 +49,8 @@ export default function EventsPage() {
   const loadEvents = async () => {
     try {
       const records = await pb.collection('events').getList(1, 50, {
-        sort: 'date',
-        expand: 'user'
+        sort: 'event_date',
+        expand: 'creator'
       });
       
       setEvents(records.items as unknown as Event[]);
@@ -95,8 +95,8 @@ export default function EventsPage() {
     setEditingId(event.id);
     setTitle(event.title);
     setDescription(event.description);
-    setDate(new Date(event.date).toISOString().split('T')[0]);
-    setTime(event.time);
+    setDate(new Date(event.event_date).toISOString().split('T')[0]);
+    setTime(event.event_time);
     setLocation(event.location);
     setAgeSuitability(event.age_suitability || 'All Ages');
     setMaxCapacity(event.max_capacity?.toString() || '');
@@ -122,10 +122,10 @@ export default function EventsPage() {
       if (!userId) return;
 
       const data = {
-        user: userId,
+        creator: userId,
         title,
         description,
-        date: new Date(date).toISOString(),
+        event_date: new Date(date).toISOString(),
         time,
         location,
         age_suitability: ageSuitability,
@@ -227,7 +227,7 @@ export default function EventsPage() {
                 <h3 className="font-display text-2xl font-bold text-text m-0 leading-tight">
                   {event.title}
                 </h3>
-                {event.user === currentUserId && (
+                {event.creator === currentUserId && (
                   <div className="flex gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEditModal(event)} className="text-text-muted hover:text-primary transition-colors">✏️</button>
                     <button onClick={() => handleDeleteEvent(event.id)} className="text-text-muted hover:text-red-500 transition-colors">🗑️</button>
@@ -235,7 +235,7 @@ export default function EventsPage() {
                 )}
               </div>
               <p className="font-serif italic text-secondary font-semibold mb-4">
-                {formatDate(event.date)} at {event.time}
+                {formatDate(event.event_date)} at {event.event_time}
               </p>
               <p className="text-sm text-text-muted mb-4">{event.description}</p>
               <div className="text-sm text-text-muted space-y-2">
