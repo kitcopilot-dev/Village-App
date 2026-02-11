@@ -217,18 +217,8 @@ export default function ManageKidsPage() {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
       const data = { user: userId, name: kidName, age: parseInt(kidAge), grade: kidGrade, focus: kidFocus, pin: kidPin };
-      if (editingKid) {
-        await pb.collection('children').update(editingKid.id, data);
-      } else {
-        await pb.collection('children').create(data);
-        // If this is the first child, mark profile as complete and redirect to dashboard
-        if (kids.length === 0) {
-          await pb.collection('profiles').update(userId, { profile_complete: true });
-          setIsKidModalOpen(false);
-          router.push('/dashboard');
-          return;
-        }
-      }
+      if (editingKid) await pb.collection('children').update(editingKid.id, data);
+      else await pb.collection('children').create(data);
       setIsKidModalOpen(false);
       loadKids();
     } catch (error) {

@@ -30,7 +30,12 @@ export default function Home() {
     
     // Check if already logged in
     if (pocketbase.authStore.isValid) {
-      router.push('/profile');
+      const profile = pocketbase.authStore.model as any;
+      if (profile?.profile_complete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/profile');
+      }
     }
   }, []);
 
@@ -42,7 +47,12 @@ export default function Home() {
     try {
       await pb.collection('profiles').authWithPassword(loginEmail, loginPassword);
       setLoginMessage('✓ Login successful!');
-      router.push('/profile');
+      const profile = pb.authStore.model as any;
+      if (profile?.profile_complete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/profile');
+      }
     } catch (error: any) {
       setLoginMessage('✗ ' + (error?.message || 'Login failed'));
     }

@@ -19,6 +19,7 @@ export interface Profile {
   telegram_id?: string;
   created: string;
   updated: string;
+  profile_complete?: boolean;
 }
 
 export interface Child {
