@@ -17,6 +17,7 @@ export interface Profile {
   profile_latitude?: number;
   profile_longitude?: number;
   telegram_id?: string;
+  faith_preference?: 'none' | 'christian' | 'lds';
   created: string;
   updated: string;
   profile_complete?: boolean;
