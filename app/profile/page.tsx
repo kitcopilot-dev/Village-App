@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editChildrenAges, setEditChildrenAges] = useState('');
+  const [editFaithPreference, setEditFaithPreference] = useState<'none' | 'christian' | 'lds'>('none');
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
@@ -46,6 +47,7 @@ export default function ProfilePage() {
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
       setEditChildrenAges(prof.children_ages || '');
+      setEditFaithPreference(prof.faith_preference || 'none');
     }
   }, [pb.authStore.isValid, router]);
 
@@ -73,7 +75,8 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges
+        children_ages: editChildrenAges,
+        faith_preference: editFaithPreference
       });
       
       // Update local state
@@ -85,7 +88,8 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges
+        children_ages: editChildrenAges,
+        faith_preference: editFaithPreference
       });
       
       setToast({ message: 'Profile updated!', type: 'success' });
@@ -193,6 +197,14 @@ export default function ProfilePage() {
                   <strong className="text-primary">Kids&apos; Ages:</strong>{' '}
                   <span className="text-text-muted">{profile.children_ages || 'None listed'}</span>
                 </p>
+                <p className="mb-4">
+                  <strong className="text-primary">Faith Preference:</strong>{' '}
+                  <span className="text-text-muted">
+                    {profile.faith_preference === 'lds' && '⛪ LDS (All Standard Works)'}
+                    {profile.faith_preference === 'christian' && '✝️ Christian (Bible-based)'}
+                    {(profile.faith_preference === 'none' || !profile.faith_preference) && '🌍 Secular (No faith content)'}
+                  </span>
+                </p>
                 {profile.telegram_id && (
                   <p className="mb-4">
                     <strong className="text-primary">Telegram:</strong>{' '}
@@ -270,6 +282,54 @@ export default function ProfilePage() {
                 value={editChildrenAges}
                 onChange={(e) => setEditChildrenAges(e.target.value)}
               />
+              
+              <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
+                <h4 className="font-display font-bold text-lg mb-2 text-primary">✨ Faith Preference</h4>
+                <p className="text-xs text-text-muted mb-4">
+                  Choose whether to include faith-based content in daily assignments and lessons.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('none')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'none'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">🌍</div>
+                    <div className="font-display font-bold text-sm">Secular</div>
+                    <div className="text-xs text-text-muted mt-1">No faith content</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('christian')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'christian'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">✝️</div>
+                    <div className="font-display font-bold text-sm">Christian</div>
+                    <div className="text-xs text-text-muted mt-1">Bible-based</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('lds')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'lds'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">⛪</div>
+                    <div className="font-display font-bold text-sm">LDS</div>
+                    <div className="text-xs text-text-muted mt-1">All Standard Works</div>
+                  </button>
+                </div>
+              </div>
               
               <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
                 <h4 className="font-display font-bold text-lg mb-2 text-primary">🤖 Village Assistant Bot</h4>
