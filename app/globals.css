@@ -138,3 +138,48 @@ input[type="date"] {
 input, select, textarea {
   max-width: 100%;
 }
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  body::before {
+    display: none !important;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .hidden.print\:block {
+    display: block !important;
+  }
+  
+  /* Remove shadows and borders for cleaner printing */
+  * {
+    box-shadow: none !important;
+  }
+  
+  /* Ensure cards have visible borders when printed */
+  [class*="Card"], [class*="card"] {
+    border: 1px solid #e5e7eb !important;
+    break-inside: avoid;
+  }
+  
+  /* Ensure color backgrounds print */
+  [class*="bg-"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Page margins */
+  @page {
+    margin: 0.5in;
+  }
+}
