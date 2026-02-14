@@ -14,6 +14,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.38.0",
     "@types/leaflet": "^1.9.21",
     "leaflet": "^1.9.4",
     "next": "16.1.6",
