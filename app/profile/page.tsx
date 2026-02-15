@@ -52,8 +52,8 @@ export default function ProfilePage() {
       if (prof.family_code) {
         pb.collection('profiles').getFullList({
           filter: `family_code = "${prof.family_code}" && id != "${prof.id}"`
-        }).then((members: Profile[]) => {
-          setFamilyMembers(members);
+        }).then((members) => {
+          setFamilyMembers(members as unknown as Profile[]);
         }).catch(err => {
           console.error('Failed to fetch family members:', err);
         });
