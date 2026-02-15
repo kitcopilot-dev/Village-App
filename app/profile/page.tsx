@@ -80,13 +80,13 @@ export default function ProfilePage() {
       // Build payload and omit undefined optional fields
       const payload: any = {
         family_name: editFamilyName,
-        description: editDescription,
-        location: editLocation,
-        telegram_id: editTelegramId,
         faith_preference: editFaithPreference
       };
-      if (editLat !== undefined) payload.profile_latitude = editLat;
-      if (editLon !== undefined) payload.profile_longitude = editLon;
+      if (editDescription.trim()) payload.description = editDescription;
+      if (editLocation.trim()) payload.location = editLocation;
+      if (editTelegramId.trim()) payload.telegram_id = editTelegramId;
+      if (editLat !== undefined && !Number.isNaN(editLat)) payload.profile_latitude = editLat;
+      if (editLon !== undefined && !Number.isNaN(editLon)) payload.profile_longitude = editLon;
 
       // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
       const updatedProfile = await pb.collection('profiles').update(profileId, payload);
