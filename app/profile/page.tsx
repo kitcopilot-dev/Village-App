@@ -78,7 +78,7 @@ export default function ProfilePage() {
       }
 
       // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
-      await pb.collection('profiles').update(profileId, {
+      const updatedProfile = await pb.collection('profiles').update(profileId, {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
@@ -88,17 +88,11 @@ export default function ProfilePage() {
         faith_preference: editFaithPreference
       });
       
+      // Refresh auth state with updated profile
+      pb.authStore.save(pb.authStore.token, updatedProfile);
+      
       // Update local state
-      setProfile({
-        ...profile!,
-        family_name: editFamilyName,
-        description: editDescription,
-        location: editLocation,
-        telegram_id: editTelegramId,
-        profile_latitude: editLat,
-        profile_longitude: editLon,
-        faith_preference: editFaithPreference
-      });
+      setProfile(updatedProfile as unknown as Profile);
       
       setToast({ message: 'Profile updated!', type: 'success' });
       setIsEditing(false);
