@@ -24,7 +24,6 @@ export default function ProfilePage() {
   const [editLon, setEditLon] = useState<number | undefined>(undefined);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [editChildrenAges, setEditChildrenAges] = useState('');
   const [editFaithPreference, setEditFaithPreference] = useState<'none' | 'christian' | 'lds'>('none');
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
@@ -46,7 +45,6 @@ export default function ProfilePage() {
       setEditTelegramId(prof.telegram_id || '');
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
-      setEditChildrenAges(prof.children_ages || '');
       setEditFaithPreference(prof.faith_preference || 'none');
     }
   }, [pb.authStore.isValid, router]);
@@ -75,7 +73,6 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges,
         faith_preference: editFaithPreference
       });
       
@@ -88,7 +85,6 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges,
         faith_preference: editFaithPreference
       });
       
@@ -194,10 +190,6 @@ export default function ProfilePage() {
                   <span className="text-text-muted">{profile.location || 'Not set'}</span>
                 </p>
                 <p className="mb-4">
-                  <strong className="text-primary">Kids&apos; Ages:</strong>{' '}
-                  <span className="text-text-muted">{profile.children_ages || 'None listed'}</span>
-                </p>
-                <p className="mb-4">
                   <strong className="text-primary">Faith Preference:</strong>{' '}
                   <span className="text-text-muted">
                     {profile.faith_preference === 'lds' && '⛪ LDS (All Standard Works)'}
@@ -277,11 +269,6 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              <Input
-                placeholder="Children Ages (e.g., 5, 9, 13)"
-                value={editChildrenAges}
-                onChange={(e) => setEditChildrenAges(e.target.value)}
-              />
               
               <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
                 <h4 className="font-display font-bold text-lg mb-2 text-primary">✨ Faith Preference</h4>
