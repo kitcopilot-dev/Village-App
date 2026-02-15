@@ -10,6 +10,7 @@ export interface User {
 export interface Profile {
   id: string;
   user: string;
+  email?: string; // Auth collection field
   family_name: string;
   description?: string;
   location?: string;
