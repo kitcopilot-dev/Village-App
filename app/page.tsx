@@ -19,6 +19,7 @@ export default function Home() {
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
   const [registerFamilyName, setRegisterFamilyName] = useState('');
+  const [registerFamilyCode, setRegisterFamilyCode] = useState('');
   const [loginMessage, setLoginMessage] = useState('');
   const [registerMessage, setRegisterMessage] = useState('');
 
@@ -70,14 +71,21 @@ export default function Home() {
 
     try {
       // Create account in profiles (it's an auth collection)
-      await pb.collection('profiles').create({
+      const profileData: any = {
         email: registerEmail,
         emailVisibility: true,
         password: registerPassword,
         passwordConfirm: registerConfirmPassword,
         family_name: registerFamilyName + " Family",
         profile_complete: false
-      });
+      };
+      
+      // If joining existing family, use their family code
+      if (registerFamilyCode.trim()) {
+        profileData.family_code = registerFamilyCode.trim().toUpperCase();
+      }
+      
+      await pb.collection('profiles').create(profileData);
 
       // Auto-login
       await pb.collection('profiles').authWithPassword(registerEmail, registerPassword);
@@ -197,6 +205,21 @@ export default function Home() {
                     onChange={(e) => setRegisterFamilyName(e.target.value)}
                     required
                   />
+                  <div className="mb-6 p-4 bg-bg-alt rounded-xl border border-border">
+                    <label className="block text-sm font-semibold mb-2 text-primary">
+                      👨‍👩‍👧‍👦 Join Existing Family (Optional)
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Family Code (e.g. ABC123XYZ)"
+                      value={registerFamilyCode}
+                      onChange={(e) => setRegisterFamilyCode(e.target.value.toUpperCase())}
+                      className="mb-0"
+                    />
+                    <p className="text-xs text-text-muted mt-2">
+                      If you're a co-parent or family member joining an existing family, enter their family code here.
+                    </p>
+                  </div>
                   {registerMessage && (
                     <p className={`mb-4 px-4 py-2 rounded-lg text-sm ${registerMessage.startsWith('✓') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                       {registerMessage}

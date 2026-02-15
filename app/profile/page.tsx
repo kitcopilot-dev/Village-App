@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const pb = getPocketBase();
   
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [familyMembers, setFamilyMembers] = useState<Profile[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editFamilyName, setEditFamilyName] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -46,6 +47,17 @@ export default function ProfilePage() {
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
       setEditFaithPreference(prof.faith_preference || 'none');
+      
+      // Fetch other family members with same family_code
+      if (prof.family_code) {
+        pb.collection('profiles').getFullList({
+          filter: `family_code = "${prof.family_code}" && id != "${prof.id}"`
+        }).then((members: Profile[]) => {
+          setFamilyMembers(members);
+        }).catch(err => {
+          console.error('Failed to fetch family members:', err);
+        });
+      }
     }
   }, [pb.authStore.isValid, router]);
 
@@ -179,8 +191,21 @@ export default function ProfilePage() {
                 <p className="mb-4">
                   <strong className="text-primary">Family Code:</strong>{' '}
                   <span className="font-mono text-2xl text-secondary font-bold tracking-widest">{profile.family_code || 'Not set'}</span>
-                  <span className="block text-xs text-text-muted mt-1">Share this code with your students for login</span>
+                  <span className="block text-xs text-text-muted mt-1">Share this code with your students and co-parents</span>
                 </p>
+                {familyMembers.length > 0 && (
+                  <p className="mb-4">
+                    <strong className="text-primary">Family Members:</strong>{' '}
+                    <span className="text-text-muted">
+                      {familyMembers.map((m, i) => (
+                        <span key={m.id}>
+                          {m.email || m.family_name}
+                          {i < familyMembers.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </span>
+                  </p>
+                )}
                 <p className="mb-4">
                   <strong className="text-primary">About:</strong>{' '}
                   <span className="text-text-muted">{profile.description || 'No description provided.'}</span>
