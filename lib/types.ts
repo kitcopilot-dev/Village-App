@@ -71,6 +71,7 @@ export interface Event {
   location: string;
   age_suitability?: string;
   max_capacity?: number;
+  supplies?: string;
   latitude?: number;
   longitude?: number;
   created: string;
