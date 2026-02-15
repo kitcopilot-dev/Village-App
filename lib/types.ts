@@ -195,6 +195,7 @@ export interface Assignment {
   description?: string;
   due_date: string;
   completed: boolean;
+  status?: string;
   score?: number;
   created: string;
   updated: string;
