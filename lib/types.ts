@@ -185,3 +185,17 @@ export interface StudentInsight {
   created: string;
   updated: string;
 }
+
+export interface Assignment {
+  id: string;
+  user: string;
+  child: string;
+  title: string;
+  subject: string;
+  description?: string;
+  due_date: string;
+  completed: boolean;
+  score?: number;
+  created: string;
+  updated: string;
+}

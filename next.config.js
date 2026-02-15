@@ -5,8 +5,8 @@ const nextConfig = {};
 
 export default withSentryConfig(nextConfig, {
   // Sentry webpack plugin options
-  org: process.env.SENTRY_ORG || 'village-homeschool',
-  project: process.env.SENTRY_PROJECT || 'village-app',
+  org: process.env.SENTRY_ORG || 'justin-lynch',
+  project: process.env.SENTRY_PROJECT || 'village-homeschool',
   
   // Only upload source maps in production builds
   silent: true,
