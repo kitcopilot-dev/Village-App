@@ -45,10 +45,14 @@ export default function Home() {
     setLoginMessage('');
     
     try {
-      await pb.collection('profiles').authWithPassword(loginEmail, loginPassword);
+      await pb.collection('users').authWithPassword(loginEmail, loginPassword);
       setLoginMessage('✓ Login successful!');
-      const profile = pb.authStore.model as any;
-      if (profile?.profile_complete) {
+      
+      // Fetch the user's profile
+      const userId = pb.authStore.model?.id;
+      const profiles = await pb.collection('profiles').getFullList({ filter: `user = "${userId}"` });
+      
+      if (profiles.length > 0 && profiles[0].profile_complete) {
         router.push('/dashboard');
       } else {
         router.push('/profile');
@@ -69,19 +73,26 @@ export default function Home() {
     }
 
     try {
-      // Create account directly in profiles (it's an auth collection)
-      await pb.collection('profiles').create({
+      // Step 1: Create user in auth collection
+      const user = await pb.collection('users').create({
         email: registerEmail,
         password: registerPassword,
         passwordConfirm: registerConfirmPassword,
+        emailVisibility: true
+      });
+
+      // Step 2: Create profile linked to user
+      await pb.collection('profiles').create({
+        user: user.id,
         family_name: registerFamilyName + " Family",
         description: '',
         location: '',
-        children_ages: ''
+        children_ages: '',
+        profile_complete: false
       });
 
-      // Auto-login via profiles
-      await pb.collection('profiles').authWithPassword(registerEmail, registerPassword);
+      // Step 3: Auto-login
+      await pb.collection('users').authWithPassword(registerEmail, registerPassword);
       
       setRegisterMessage('✓ Account created! Redirecting...');
       setTimeout(() => router.push('/profile'), 1000);
