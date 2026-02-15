@@ -77,16 +77,19 @@ export default function ProfilePage() {
         return;
       }
 
-      // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
-      const updatedProfile = await pb.collection('profiles').update(profileId, {
+      // Build payload and omit undefined optional fields
+      const payload: any = {
         family_name: editFamilyName,
         description: editDescription,
         location: editLocation,
         telegram_id: editTelegramId,
-        profile_latitude: editLat,
-        profile_longitude: editLon,
         faith_preference: editFaithPreference
-      });
+      };
+      if (editLat !== undefined) payload.profile_latitude = editLat;
+      if (editLon !== undefined) payload.profile_longitude = editLon;
+
+      // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
+      const updatedProfile = await pb.collection('profiles').update(profileId, payload);
       
       // Refresh auth state with updated profile
       pb.authStore.save(pb.authStore.token, updatedProfile);
@@ -98,6 +101,7 @@ export default function ProfilePage() {
       setIsEditing(false);
     } catch (error: any) {
       console.error('Profile save error:', error);
+      console.error('Profile save error details:', JSON.stringify(error?.data || error?.response || error, null, 2));
       // Extract detailed error from PocketBase
       const errorMsg = error?.data?.message || error?.message || 'Update failed';
       setToast({ message: errorMsg, type: 'error' });
