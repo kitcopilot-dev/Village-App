@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Syne, Fraunces } from 'next/font/google';
 import './globals.css';
-import ErrorBoundary from '@/components/ErrorBoundary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const syneFont = Syne({
   weight: ['700', '800'],
