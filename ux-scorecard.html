@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village UX Scorecard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .score-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .grade {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .category {
+            margin-bottom: 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .category:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .category-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .category-score {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .criterion {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .criterion:hover {
+            background: #f0f0f0;
+        }
+        
+        .criterion input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .criterion-label {
+            flex: 1;
+            color: #333;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        
+        .criterion-points {
+            color: #999;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: right;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .score-number {
+                font-size: 3em;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Village UX Scorecard</h1>
+        <p class="subtitle">Evaluate the user experience quality of your homeschool app</p>
+        
+        <div class="score-display">
+            <div class="score-number" id="totalScore">0</div>
+            <div class="score-label">out of 100 points</div>
+            <div class="grade" id="grade">—</div>
+        </div>
+        
+        <!-- Category 1: Ease of Use -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-title">📱 Ease of Use</span>
+                <span class="category-score"><span id="cat1Score">0</span>/25</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="ease1" data-points="10" data-category="1">
+                <label for="ease1" class="criterion-label">Can complete primary task in under 3 minutes</label>
+                <span class="criterion-points">10 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="ease2" data-points="5" data-category="1">
+                <label for="ease2" class="criterion-label">Forms are clear and well-validated</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="ease3" data-points="5" data-category="1">
+                <label for="ease3" class="criterion-label">Error messages are helpful and actionable</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="ease4" data-points="5" data-category="1">
+                <label for="ease4" class="criterion-label">No confusing jargon or unclear language</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+        </div>
+        
+        <!-- Category 2: Visual Design -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-title">🎨 Visual Design</span>
+                <span class="category-score"><span id="cat2Score">0</span>/20</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="design1" data-points="5" data-category="2">
+                <label for="design1" class="criterion-label">Consistent color scheme throughout</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="design2" data-points="5" data-category="2">
+                <label for="design2" class="criterion-label">Readable typography (font sizes, line height)</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="design3" data-points="5" data-category="2">
+                <label for="design3" class="criterion-label">Proper spacing and whitespace</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="design4" data-points="5" data-category="2">
+                <label for="design4" class="criterion-label">Professional, polished appearance</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+        </div>
+        
+        <!-- Category 3: Performance -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-title">⚡ Performance</span>
+                <span class="category-score"><span id="cat3Score">0</span>/20</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="perf1" data-points="10" data-category="3">
+                <label for="perf1" class="criterion-label">Pages load in under 2 seconds</label>
+                <span class="criterion-points">10 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="perf2" data-points="5" data-category="3">
+                <label for="perf2" class="criterion-label">No layout shift (CLS score good)</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="perf3" data-points="5" data-category="3">
+                <label for="perf3" class="criterion-label">Smooth animations and transitions</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+        </div>
+        
+        <!-- Category 4: Accessibility -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-title">♿ Accessibility</span>
+                <span class="category-score"><span id="cat4Score">0</span>/15</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="a11y1" data-points="5" data-category="4">
+                <label for="a11y1" class="criterion-label">Keyboard navigation works everywhere</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="a11y2" data-points="5" data-category="4">
+                <label for="a11y2" class="criterion-label">Color contrast meets WCAG AA (4.5:1)</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="a11y3" data-points="5" data-category="4">
+                <label for="a11y3" class="criterion-label">Mobile-friendly (touch targets ≥44x44px)</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+        </div>
+        
+        <!-- Category 5: Functionality -->
+        <div class="category">
+            <div class="category-header">
+                <span class="category-title">🔧 Functionality</span>
+                <span class="category-score"><span id="cat5Score">0</span>/20</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="func1" data-points="5" data-category="5">
+                <label for="func1" class="criterion-label">No broken links or 404 errors</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="func2" data-points="10" data-category="5">
+                <label for="func2" class="criterion-label">All features work as expected</label>
+                <span class="criterion-points">10 pts</span>
+            </div>
+            <div class="criterion">
+                <input type="checkbox" id="func3" data-points="5" data-category="5">
+                <label for="func3" class="criterion-label">Data persists correctly (no loss on refresh)</label>
+                <span class="criterion-points">5 pts</span>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn-primary" onclick="exportResults()">📊 Export Results</button>
+            <button class="btn-secondary" onclick="resetScorecard()">🔄 Reset</button>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Grading Scale:</strong> 90-100 = Excellent | 75-89 = Good | 60-74 = Fair | &lt;60 = Poor</p>
+            <p style="margin-top: 10px;">Village App UX Scorecard | 2026-02-14</p>
+        </div>
+    </div>
+    
+    <script>
+        // Calculate and update scores
+        function updateScores() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let totalScore = 0;
+            const categoryScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const points = parseInt(cb.dataset.points);
+                    const category = parseInt(cb.dataset.category);
+                    totalScore += points;
+                    categoryScores[category] += points;
+                }
+            });
+            
+            // Update total score
+            document.getElementById('totalScore').textContent = totalScore;
+            
+            // Update category scores
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`cat${i}Score`).textContent = categoryScores[i];
+            }
+            
+            // Update grade
+            const gradeElement = document.getElementById('grade');
+            if (totalScore >= 90) {
+                gradeElement.textContent = 'Excellent ✨';
+                gradeElement.style.color = '#27ae60';
+            } else if (totalScore >= 75) {
+                gradeElement.textContent = 'Good 👍';
+                gradeElement.style.color = '#3498db';
+            } else if (totalScore >= 60) {
+                gradeElement.textContent = 'Fair 🤔';
+                gradeElement.style.color = '#f39c12';
+            } else {
+                gradeElement.textContent = 'Needs Work 🔧';
+                gradeElement.style.color = '#e74c3c';
+            }
+            
+            // Save to localStorage
+            saveProgress();
+        }
+        
+        // Save progress to localStorage
+        function saveProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const state = {};
+            checkboxes.forEach(cb => {
+                state[cb.id] = cb.checked;
+            });
+            localStorage.setItem('villageUXScorecard', JSON.stringify(state));
+        }
+        
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('villageUXScorecard');
+            if (saved) {
+                const state = JSON.parse(saved);
+                Object.keys(state).forEach(id => {
+                    const cb = document.getElementById(id);
+                    if (cb) cb.checked = state[id];
+                });
+                updateScores();
+            }
+        }
+        
+        // Reset scorecard
+        function resetScorecard() {
+            if (confirm('Reset all scores? This cannot be undone.')) {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+                localStorage.removeItem('villageUXScorecard');
+                updateScores();
+            }
+        }
+        
+        // Export results as text
+        function exportResults() {
+            const totalScore = document.getElementById('totalScore').textContent;
+            const grade = document.getElementById('grade').textContent;
+            const timestamp = new Date().toISOString();
+            
+            let report = `Village UX Scorecard Results\n`;
+            report += `Date: ${timestamp}\n\n`;
+            report += `Total Score: ${totalScore}/100\n`;
+            report += `Grade: ${grade}\n\n`;
+            report += `Category Breakdown:\n`;
+            
+            for (let i = 1; i <= 5; i++) {
+                const catScore = document.getElementById(`cat${i}Score`).textContent;
+                const catNames = ['', 'Ease of Use', 'Visual Design', 'Performance', 'Accessibility', 'Functionality'];
+                report += `  ${catNames[i]}: ${catScore}\n`;
+            }
+            
+            report += `\nPassing Criteria:\n`;
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => {
+                const label = document.querySelector(`label[for="${cb.id}"]`).textContent;
+                report += `  ✅ ${label}\n`;
+            });
+            
+            report += `\nFailing Criteria:\n`;
+            const unchecked = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
+            unchecked.forEach(cb => {
+                const label = document.querySelector(`label[for="${cb.id}"]`).textContent;
+                report += `  ❌ ${label}\n`;
+            });
+            
+            // Download as text file
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `village-ux-scorecard-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProgress();
+            
+            // Add event listeners to all checkboxes
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateScores);
+            });
+        });
+    </script>
+</body>
+</html>

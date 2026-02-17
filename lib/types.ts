@@ -10,6 +10,7 @@ export interface User {
 export interface Profile {
   id: string;
   user: string;
+  email?: string; // Auth collection field
   family_name: string;
   description?: string;
   location?: string;
@@ -17,6 +18,7 @@ export interface Profile {
   profile_latitude?: number;
   profile_longitude?: number;
   telegram_id?: string;
+  faith_preference?: 'none' | 'christian' | 'lds';
   created: string;
   updated: string;
   profile_complete?: boolean;
@@ -70,6 +72,7 @@ export interface Event {
   location: string;
   age_suitability?: string;
   max_capacity?: number;
+  supplies?: string;
   latitude?: number;
   longitude?: number;
   created: string;
@@ -181,6 +184,21 @@ export interface StudentInsight {
   subject: string;
   observation: string;
   last_updated: string;
+  created: string;
+  updated: string;
+}
+
+export interface Assignment {
+  id: string;
+  user: string;
+  child: string;
+  title: string;
+  subject: string;
+  description?: string;
+  due_date: string;
+  completed: boolean;
+  status?: string;
+  score?: number;
   created: string;
   updated: string;
 }

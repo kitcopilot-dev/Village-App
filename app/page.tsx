@@ -19,6 +19,7 @@ export default function Home() {
   const [registerPassword, setRegisterPassword] = useState('');
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
   const [registerFamilyName, setRegisterFamilyName] = useState('');
+  const [registerFamilyCode, setRegisterFamilyCode] = useState('');
   const [loginMessage, setLoginMessage] = useState('');
   const [registerMessage, setRegisterMessage] = useState('');
 
@@ -69,18 +70,24 @@ export default function Home() {
     }
 
     try {
-      // Create account directly in profiles (it's an auth collection)
-      await pb.collection('profiles').create({
+      // Create account in profiles (it's an auth collection)
+      const profileData: any = {
         email: registerEmail,
+        emailVisibility: true,
         password: registerPassword,
         passwordConfirm: registerConfirmPassword,
         family_name: registerFamilyName + " Family",
-        description: '',
-        location: '',
-        children_ages: ''
-      });
+        profile_complete: false
+      };
+      
+      // If joining existing family, use their family code
+      if (registerFamilyCode.trim()) {
+        profileData.family_code = registerFamilyCode.trim().toUpperCase();
+      }
+      
+      await pb.collection('profiles').create(profileData);
 
-      // Auto-login via profiles
+      // Auto-login
       await pb.collection('profiles').authWithPassword(registerEmail, registerPassword);
       
       setRegisterMessage('✓ Account created! Redirecting...');
@@ -88,7 +95,7 @@ export default function Home() {
     } catch (error: any) {
       const errorMsg = error?.data?.message || error?.message || 'Registration failed';
       setRegisterMessage('✗ ' + errorMsg);
-      console.error('Registration error details:', JSON.stringify(error.response?.data || error.data || error));
+      console.error('Registration error details:',  JSON.stringify(error?.response || error?.data || error, null, 2));
     }
   };
 
@@ -115,8 +122,8 @@ export default function Home() {
         <section className="pt-20 pb-16 md:pt-32 md:pb-24 text-center relative overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/5 rounded-full blur-3xl -z-10" />
           
-          <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9] break-words">
-            Homeschooling is <span className="text-primary italic">Better</span> <br className="hidden md:block" /> Together.
+          <h1 className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 leading-[0.9]">
+            <span className="whitespace-nowrap">Homeschooling</span> is <span className="text-primary italic">Better</span> <br className="hidden md:block" /> Together.
           </h1>
           <p className="text-xl md:text-2xl text-text-muted max-w-2xl mx-auto mb-12 font-serif italic">
             Village is a handcrafted space for modern families to coordinate gatherings, track progress, and navigate homeschooling laws with confidence.
@@ -198,6 +205,21 @@ export default function Home() {
                     onChange={(e) => setRegisterFamilyName(e.target.value)}
                     required
                   />
+                  <div className="mb-6 p-4 bg-bg-alt rounded-xl border border-border">
+                    <label className="block text-sm font-semibold mb-2 text-primary">
+                      👨‍👩‍👧‍👦 Join Existing Family (Optional)
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Family Code (e.g. ABC123XYZ)"
+                      value={registerFamilyCode}
+                      onChange={(e) => setRegisterFamilyCode(e.target.value.toUpperCase())}
+                      className="mb-0"
+                    />
+                    <p className="text-xs text-text-muted mt-2">
+                      If you're a co-parent or family member joining an existing family, enter their family code here.
+                    </p>
+                  </div>
                   {registerMessage && (
                     <p className={`mb-4 px-4 py-2 rounded-lg text-sm ${registerMessage.startsWith('✓') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                       {registerMessage}

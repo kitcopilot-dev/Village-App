@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const pb = getPocketBase();
   
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [familyMembers, setFamilyMembers] = useState<Profile[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editFamilyName, setEditFamilyName] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -24,7 +25,7 @@ export default function ProfilePage() {
   const [editLon, setEditLon] = useState<number | undefined>(undefined);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [editChildrenAges, setEditChildrenAges] = useState('');
+  const [editFaithPreference, setEditFaithPreference] = useState<'none' | 'christian' | 'lds'>('none');
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
@@ -45,7 +46,18 @@ export default function ProfilePage() {
       setEditTelegramId(prof.telegram_id || '');
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
-      setEditChildrenAges(prof.children_ages || '');
+      setEditFaithPreference(prof.faith_preference || 'none');
+      
+      // Fetch other family members with same family_code
+      if (prof.family_code) {
+        pb.collection('profiles').getFullList({
+          filter: `family_code = "${prof.family_code}" && id != "${prof.id}"`
+        }).then((members) => {
+          setFamilyMembers(members as unknown as Profile[]);
+        }).catch(err => {
+          console.error('Failed to fetch family members:', err);
+        });
+      }
     }
   }, [pb.authStore.isValid, router]);
 
@@ -65,33 +77,31 @@ export default function ProfilePage() {
         return;
       }
 
-      // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
-      await pb.collection('profiles').update(profileId, {
+      // Build payload and omit undefined optional fields
+      const payload: any = {
         family_name: editFamilyName,
-        description: editDescription,
-        location: editLocation,
-        telegram_id: editTelegramId,
-        profile_latitude: editLat,
-        profile_longitude: editLon,
-        children_ages: editChildrenAges
-      });
+        faith_preference: editFaithPreference
+      };
+      if (editDescription.trim()) payload.description = editDescription;
+      if (editLocation.trim()) payload.location = editLocation;
+      if (editTelegramId.trim()) payload.telegram_id = editTelegramId;
+      if (editLat !== undefined && !Number.isNaN(editLat)) payload.profile_latitude = editLat;
+      if (editLon !== undefined && !Number.isNaN(editLon)) payload.profile_longitude = editLon;
+
+      // Update the profile directly (authStore.model IS the profile when logged in via profiles collection)
+      const updatedProfile = await pb.collection('profiles').update(profileId, payload);
+      
+      // Refresh auth state with updated profile
+      pb.authStore.save(pb.authStore.token, updatedProfile);
       
       // Update local state
-      setProfile({
-        ...profile!,
-        family_name: editFamilyName,
-        description: editDescription,
-        location: editLocation,
-        telegram_id: editTelegramId,
-        profile_latitude: editLat,
-        profile_longitude: editLon,
-        children_ages: editChildrenAges
-      });
+      setProfile(updatedProfile as unknown as Profile);
       
       setToast({ message: 'Profile updated!', type: 'success' });
       setIsEditing(false);
     } catch (error: any) {
       console.error('Profile save error:', error);
+      console.error('Profile save error details:', JSON.stringify(error?.data || error?.response || error, null, 2));
       // Extract detailed error from PocketBase
       const errorMsg = error?.data?.message || error?.message || 'Update failed';
       setToast({ message: errorMsg, type: 'error' });
@@ -179,8 +189,21 @@ export default function ProfilePage() {
                 <p className="mb-4">
                   <strong className="text-primary">Family Code:</strong>{' '}
                   <span className="font-mono text-2xl text-secondary font-bold tracking-widest">{profile.family_code || 'Not set'}</span>
-                  <span className="block text-xs text-text-muted mt-1">Share this code with your students for login</span>
+                  <span className="block text-xs text-text-muted mt-1">Share this code with your students and co-parents</span>
                 </p>
+                {familyMembers.length > 0 && (
+                  <p className="mb-4">
+                    <strong className="text-primary">Family Members:</strong>{' '}
+                    <span className="text-text-muted">
+                      {familyMembers.map((m, i) => (
+                        <span key={m.id}>
+                          {m.email || m.family_name}
+                          {i < familyMembers.length - 1 && ', '}
+                        </span>
+                      ))}
+                    </span>
+                  </p>
+                )}
                 <p className="mb-4">
                   <strong className="text-primary">About:</strong>{' '}
                   <span className="text-text-muted">{profile.description || 'No description provided.'}</span>
@@ -190,8 +213,12 @@ export default function ProfilePage() {
                   <span className="text-text-muted">{profile.location || 'Not set'}</span>
                 </p>
                 <p className="mb-4">
-                  <strong className="text-primary">Kids&apos; Ages:</strong>{' '}
-                  <span className="text-text-muted">{profile.children_ages || 'None listed'}</span>
+                  <strong className="text-primary">Faith Preference:</strong>{' '}
+                  <span className="text-text-muted">
+                    {profile.faith_preference === 'lds' && '⛪ LDS (All Standard Works)'}
+                    {profile.faith_preference === 'christian' && '✝️ Christian (Bible-based)'}
+                    {(profile.faith_preference === 'none' || !profile.faith_preference) && '🌍 Secular (No faith content)'}
+                  </span>
                 </p>
                 {profile.telegram_id && (
                   <p className="mb-4">
@@ -265,11 +292,54 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
-              <Input
-                placeholder="Children Ages (e.g., 5, 9, 13)"
-                value={editChildrenAges}
-                onChange={(e) => setEditChildrenAges(e.target.value)}
-              />
+              
+              <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
+                <h4 className="font-display font-bold text-lg mb-2 text-primary">✨ Faith Preference</h4>
+                <p className="text-xs text-text-muted mb-4">
+                  Choose whether to include faith-based content in daily assignments and lessons.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('none')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'none'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">🌍</div>
+                    <div className="font-display font-bold text-sm">Secular</div>
+                    <div className="text-xs text-text-muted mt-1">No faith content</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('christian')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'christian'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">✝️</div>
+                    <div className="font-display font-bold text-sm">Christian</div>
+                    <div className="text-xs text-text-muted mt-1">Bible-based</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFaithPreference('lds')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      editFaithPreference === 'lds'
+                        ? 'border-primary bg-primary/10 font-bold'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">⛪</div>
+                    <div className="font-display font-bold text-sm">LDS</div>
+                    <div className="text-xs text-text-muted mt-1">All Standard Works</div>
+                  </button>
+                </div>
+              </div>
               
               <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
                 <h4 className="font-display font-bold text-lg mb-2 text-primary">🤖 Village Assistant Bot</h4>

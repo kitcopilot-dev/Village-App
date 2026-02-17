@@ -6,9 +6,10 @@ interface CardProps {
   hoverable?: boolean;
   accent?: 'sage' | 'terracotta' | 'mustard' | 'none';
   style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-export function Card({ children, className = '', hoverable = false, accent = 'none', style }: CardProps) {
+export function Card({ children, className = '', hoverable = false, accent = 'none', style, onClick }: CardProps) {
   const accentColors = {
     sage: 'before:bg-primary-light',
     terracotta: 'before:bg-secondary',
@@ -26,10 +27,12 @@ export function Card({ children, className = '', hoverable = false, accent = 'no
         bg-card rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-12 shadow-[0_10px_30px_-10px_rgba(75,99,68,0.12)] 
         border border-border relative overflow-hidden
         ${hoverable ? 'transition-all duration-400 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(75,99,68,0.2)] hover:border-primary-light' : ''}
+        ${onClick ? 'cursor-pointer' : ''}
         ${accentBar}
         ${className}
       `}
       style={style}
+      onClick={onClick}
     >
       {children}
     </div>

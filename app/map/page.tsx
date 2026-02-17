@@ -85,7 +85,6 @@ export default function MapPage() {
               <div style="padding: 10px;">
                 <strong style="display: block; font-size: 14px; margin-bottom: 4px;">${p.family_name}</strong>
                 <span style="color: #5C615A; font-size: 12px;">📍 ${p.location}</span>
-                ${p.children_ages ? `<p style="margin-top: 8px; font-size: 11px;">👥 Kids ages: ${p.children_ages}</p>` : ''}
               </div>
             `);
           markers.push(marker);

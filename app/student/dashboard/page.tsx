@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
 import { Child, Course, Lesson } from '@/lib/types';
@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
+import { HomeworkHelper } from '@/components/HomeworkHelper';
 
 export default function StudentDashboardPage() {
   const router = useRouter();
@@ -58,6 +59,46 @@ export default function StudentDashboardPage() {
     localStorage.removeItem('village_student_id');
     router.push('/student');
   };
+
+  // Save tutor conversations for parent review
+  const saveConversation = useCallback(async (messages: { role: string; content: string; timestamp: Date }[]) => {
+    if (!student || messages.length < 2) return;
+    
+    try {
+      // Get existing session or create new one
+      const sessionKey = `tutor_session_${student.id}_${new Date().toISOString().split('T')[0]}`;
+      const existingSession = localStorage.getItem(sessionKey);
+      
+      const sessionData = {
+        student_id: student.id,
+        student_name: student.name,
+        date: new Date().toISOString(),
+        messages: messages.map(m => ({
+          role: m.role,
+          content: m.content,
+          timestamp: m.timestamp.toISOString()
+        }))
+      };
+
+      // Save to localStorage for now (can be synced to PocketBase later)
+      localStorage.setItem(sessionKey, JSON.stringify(sessionData));
+
+      // Also try to save to PocketBase if collection exists
+      try {
+        await pb.collection('tutor_sessions').create({
+          child: student.id,
+          user: student.user,
+          date: new Date().toISOString(),
+          messages: JSON.stringify(sessionData.messages),
+        });
+      } catch (e) {
+        // Collection might not exist yet, that's okay
+        console.log('Tutor sessions collection not set up yet');
+      }
+    } catch (e) {
+      console.error('Failed to save conversation:', e);
+    }
+  }, [student, pb]);
 
   if (loading) return <LoadingScreen message="Opening your Learning Vault..." />;
   if (!student) return null;
@@ -126,6 +167,13 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* AI Homework Helper */}
+      <HomeworkHelper 
+        studentName={student.name}
+        gradeLevel={student.grade || `${student.age} years old`}
+        onConversation={saveConversation}
+      />
     </>
   );
 }
