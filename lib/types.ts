@@ -21,6 +21,7 @@ export interface Profile {
   updated: string;
   profile_complete?: boolean;
   family_code?: string;
+  faith_preference?: 'none' | 'christian' | 'lds';
 }
 
 export interface Child {
@@ -72,6 +73,7 @@ export interface Event {
   max_capacity?: number;
   latitude?: number;
   longitude?: number;
+  supplies?: string;
   created: string;
   updated: string;
   expand?: {
@@ -181,6 +183,35 @@ export interface StudentInsight {
   subject: string;
   observation: string;
   last_updated: string;
+  created: string;
+  updated: string;
+}
+
+export interface Assignment {
+  id: string;
+  user: string;
+  child?: string;
+  title: string;
+  description?: string;
+  subject?: string;
+  due_date?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'Graded';
+  score?: number;
+  feedback?: string;
+  created: string;
+  updated: string;
+}
+
+export interface FamilyChild {
+  id: string;
+  profile: string;
+  first_name: string;
+  nickname?: string;
+  grade_level: string;
+  birthdate?: string;
+  interests: string[];
+  family_code: string;
+  pin?: string;
   created: string;
   updated: string;
 }

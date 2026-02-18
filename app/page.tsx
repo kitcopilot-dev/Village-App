@@ -34,7 +34,7 @@ export default function Home() {
       if (profile?.profile_complete) {
         router.push('/dashboard');
       } else {
-        router.push('/profile');
+        router.push('/onboarding');
       }
     }
   }, []);
@@ -51,7 +51,7 @@ export default function Home() {
       if (profile?.profile_complete) {
         router.push('/dashboard');
       } else {
-        router.push('/profile');
+        router.push('/onboarding');
       }
     } catch (error: any) {
       setLoginMessage('✗ ' + (error?.message || 'Login failed'));
@@ -84,7 +84,7 @@ export default function Home() {
       await pb.collection('profiles').authWithPassword(registerEmail, registerPassword);
       
       setRegisterMessage('✓ Account created! Redirecting...');
-      setTimeout(() => router.push('/profile'), 1000);
+      setTimeout(() => router.push('/onboarding'), 1000);
     } catch (error: any) {
       const errorMsg = error?.data?.message || error?.message || 'Registration failed';
       setRegisterMessage('✗ ' + errorMsg);

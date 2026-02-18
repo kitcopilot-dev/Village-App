@@ -208,7 +208,7 @@ export default function AssignmentsPage() {
                   <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-xs sm:text-sm text-text-muted">
                     <span className="font-bold text-primary">🧒 {kid?.name || 'Unknown'}</span>
                     <span>📚 {a.subject || 'General'}</span>
-                    <span>📅 {new Date(a.due_date).toLocaleDateString()}</span>
+                    <span>📅 {a.due_date ? new Date(a.due_date).toLocaleDateString() : 'No due date'}</span>
                   </div>
                   {a.description && <p className="mt-3 text-xs sm:text-sm text-text-muted line-clamp-2">{a.description}</p>}
                 </div>
