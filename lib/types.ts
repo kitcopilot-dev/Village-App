@@ -215,3 +215,15 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface StudySession {
+  id: string;
+  user: string;
+  child?: string;
+  subject?: string;
+  duration_minutes: number;
+  started_at: string;
+  completed_at?: string;
+  created: string;
+  updated: string;
+}
