@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
-import { Child, Course, ActivityLog, Assignment, SchoolYear, SchoolBreak } from '@/lib/types';
+import { Child, Course, ActivityLog, Assignment, SchoolYear, SchoolBreak, Goal } from '@/lib/types';
 import { getExpectedLesson } from '@/lib/calendar-utils';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [schoolYear, setSchoolYear] = useState<SchoolYear | null>(null);
   const [breaks, setBreaks] = useState<SchoolBreak[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -102,6 +103,17 @@ export default function DashboardPage() {
         }
       } catch (e) {
         console.warn('Calendar data failed to load');
+      }
+
+      // Load active goals
+      try {
+        const goalRecords = await pb.collection('goals').getFullList({
+          filter: `user = "${userId}" && status = "active"`,
+          sort: 'deadline,-created'
+        });
+        setGoals(goalRecords as unknown as Goal[]);
+      } catch (e) {
+        console.warn('Goals not found');
       }
     } catch (error) {
       console.error('Dashboard load error:', error);
@@ -221,6 +233,9 @@ export default function DashboardPage() {
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/map')}>
                 📍 Village Map
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/goals')}>
+                🎯 Goals
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/assignments')}>
                 📝 Assignments
@@ -416,6 +431,86 @@ export default function DashboardPage() {
                         })}
                       </div>
                     </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Active Goals Widget */}
+              {goals.length > 0 && (
+                <div className="mt-12">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="font-serif italic text-3xl text-primary">🎯 Active Goals</h3>
+                    <Button variant="ghost" size="sm" onClick={() => router.push('/goals')}>View All →</Button>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {goals.slice(0, 6).map(goal => {
+                      const kid = kids.find(k => k.id === goal.child);
+                      const progress = goal.target_type === 'completion' 
+                        ? (goal.status === 'completed' ? 100 : 0)
+                        : goal.target_value 
+                          ? Math.min(100, Math.round((goal.current_value / goal.target_value) * 100))
+                          : 0;
+                      
+                      const daysRemaining = goal.deadline 
+                        ? Math.ceil((new Date(goal.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                        : null;
+                      const isUrgent = daysRemaining !== null && daysRemaining >= 0 && daysRemaining <= 7;
+                      const isOverdue = daysRemaining !== null && daysRemaining < 0;
+
+                      const categoryIcons: Record<string, string> = {
+                        academic: '📚', reading: '📖', skill: '🎯', habit: '🔄', project: '🛠️', other: '✨'
+                      };
+
+                      return (
+                        <div 
+                          key={goal.id} 
+                          className={`bg-card rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all hover:border-primary/50 hover:shadow-md ${
+                            isOverdue ? 'border-red-200' : isUrgent ? 'border-yellow-200' : 'border-border'
+                          }`}
+                          onClick={() => router.push('/goals')}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <span className="text-lg">{categoryIcons[goal.category] || '✨'}</span>
+                            {kid && (
+                              <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                {kid.name}
+                              </span>
+                            )}
+                            {!kid && (
+                              <span className="text-xs font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
+                                Family
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="font-display font-bold text-sm mb-2 line-clamp-2">{goal.title}</h4>
+                          
+                          {goal.target_type === 'number' && goal.target_value && (
+                            <>
+                              <div className="flex justify-between text-xs text-text-muted mb-1">
+                                <span>{goal.current_value} / {goal.target_value} {goal.unit || ''}</span>
+                                <span className="font-bold text-primary">{progress}%</span>
+                              </div>
+                              <ProgressBar percentage={progress} />
+                            </>
+                          )}
+                          
+                          {goal.target_type === 'streak' && (
+                            <div className="flex items-center gap-1 text-sm">
+                              <span>🔥</span>
+                              <span className="font-bold text-secondary">{goal.current_value}</span>
+                              <span className="text-text-muted">/ {goal.target_value} days</span>
+                            </div>
+                          )}
+
+                          {daysRemaining !== null && (
+                            <p className={`text-xs mt-2 ${isOverdue ? 'text-red-600 font-bold' : isUrgent ? 'text-yellow-600' : 'text-text-muted'}`}>
+                              {isOverdue ? `⚠️ ${Math.abs(daysRemaining)} days overdue` : `📅 ${daysRemaining} days left`}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
