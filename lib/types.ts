@@ -215,3 +215,18 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface StudySession {
+  id: string;
+  user: string;
+  child?: string; // Optional: family study sessions have no child
+  subject: string;
+  duration: number; // Duration in seconds
+  start_time: string; // ISO timestamp
+  end_time?: string; // ISO timestamp (set when session ends)
+  notes?: string;
+  pomodoro_count?: number; // Number of pomodoro cycles completed
+  status: 'active' | 'paused' | 'completed';
+  created: string;
+  updated: string;
+}
