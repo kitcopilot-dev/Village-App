@@ -28,87 +28,97 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+    
     if (!pb.authStore.isValid) {
       router.push('/');
       return;
     }
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const userId = pb.authStore.model?.id;
-      if (!userId) return;
-
-      // Load children
-      const childRecords = await pb.collection('children').getFullList({
-        filter: `user = "${userId}"`,
-        sort: 'name'
-      });
-
-      // Load courses for each child
-      const kidsWithCourses = await Promise.all(
-        childRecords.map(async (kid) => {
-          try {
-            const courses = await pb.collection('courses').getFullList({
-              filter: `child = "${kid.id}"`,
-              sort: 'name'
-            });
-            return { ...kid, courses } as unknown as ChildWithCourses;
-          } catch {
-            return { ...kid, courses: [] } as unknown as ChildWithCourses;
-          }
-        })
-      );
-
-      setKids(kidsWithCourses);
-
-      // Load recent activity
+    
+    const loadDashboard = async () => {
       try {
-        const activityRecords = await pb.collection('activity_logs').getFullList({
-          filter: `user = "${userId}"`,
-          sort: '-date',
-          limit: 10
-        });
-        setActivities(activityRecords as unknown as ActivityLog[]);
-      } catch (e) {
-        console.warn('Activity logs not found, falling back to course data');
-      }
+        const userId = pb.authStore.model?.id;
+        if (!userId || cancelled) return;
 
-      // Load assignments for grading analytics
-      try {
-        const assignmentRecords = await pb.collection('assignments').getFullList({
+        // Load children
+        const childRecords = await pb.collection('children').getFullList({
           filter: `user = "${userId}"`,
-          sort: '-due_date'
+          sort: 'name'
         });
-        setAssignments(assignmentRecords as unknown as Assignment[]);
-      } catch (e) {
-        console.warn('Assignments not found');
-      }
 
-      // Load school year and breaks
-      try {
-        const years = await pb.collection('school_years').getFullList({
-          filter: `user = "${userId}"`,
-          sort: '-start_date',
-          limit: 1
-        });
-        if (years.length > 0) {
-          setSchoolYear(years[0] as unknown as SchoolYear);
-          const breakRecords = await pb.collection('school_breaks').getFullList({
-            filter: `school_year = "${years[0].id}"`
+        if (cancelled) return;
+
+        // Load courses for each child
+        const kidsWithCourses = await Promise.all(
+          childRecords.map(async (kid) => {
+            try {
+              const courses = await pb.collection('courses').getFullList({
+                filter: `child = "${kid.id}"`,
+                sort: 'name'
+              });
+              return { ...kid, courses } as unknown as ChildWithCourses;
+            } catch {
+              return { ...kid, courses: [] } as unknown as ChildWithCourses;
+            }
+          })
+        );
+
+        if (cancelled) return;
+        setKids(kidsWithCourses);
+
+        // Load recent activity
+        try {
+          const activityRecords = await pb.collection('activity_logs').getFullList({
+            filter: `user = "${userId}"`,
+            sort: '-date',
+            limit: 10
           });
-          setBreaks(breakRecords as unknown as SchoolBreak[]);
+          if (!cancelled) setActivities(activityRecords as unknown as ActivityLog[]);
+        } catch (e) {
+          console.warn('Activity logs not found, falling back to course data');
         }
-      } catch (e) {
-        console.warn('Calendar data failed to load');
+
+        // Load assignments for grading analytics
+        try {
+          const assignmentRecords = await pb.collection('assignments').getFullList({
+            filter: `user = "${userId}"`,
+            sort: '-due_date'
+          });
+          if (!cancelled) setAssignments(assignmentRecords as unknown as Assignment[]);
+        } catch (e) {
+          console.warn('Assignments not found');
+        }
+
+        // Load school year and breaks
+        try {
+          const years = await pb.collection('school_years').getFullList({
+            filter: `user = "${userId}"`,
+            sort: '-start_date',
+            limit: 1
+          });
+          if (!cancelled && years.length > 0) {
+            setSchoolYear(years[0] as unknown as SchoolYear);
+            const breakRecords = await pb.collection('school_breaks').getFullList({
+              filter: `school_year = "${years[0].id}"`
+            });
+            if (!cancelled) setBreaks(breakRecords as unknown as SchoolBreak[]);
+          }
+        } catch (e) {
+          console.warn('Calendar data failed to load');
+        }
+      } catch (error) {
+        if (!cancelled) console.error('Dashboard load error:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } catch (error) {
-      console.error('Dashboard load error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    
+    loadDashboard();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLogout = () => {
     pb.authStore.clear();
@@ -236,6 +246,9 @@ export default function DashboardPage() {
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/calendar')}>
                 🗓️ Calendar
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/resources')}>
+                📚 Resources
               </Button>
               <Button variant="ghost" size="sm" onClick={() => router.push('/profile')}>← Profile</Button>
             </div>
