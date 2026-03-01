@@ -215,3 +215,22 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface Resource {
+  id: string;
+  user: string;
+  child?: string;
+  title: string;
+  description?: string;
+  url?: string;
+  type: 'website' | 'book' | 'video' | 'printable' | 'supply' | 'app' | 'other';
+  subject?: string;
+  tags?: string[];
+  rating?: number;
+  notes?: string;
+  cost?: number;
+  is_favorite?: boolean;
+  archived?: boolean;
+  created: string;
+  updated: string;
+}
