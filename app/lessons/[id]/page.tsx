@@ -24,19 +24,32 @@ export default function LessonPlayerPage() {
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    
+    const loadLesson = async (lessonId: string) => {
+      try {
+        const record = await pb.collection('lessons').getOne(lessonId);
+        if (!cancelled) {
+          setLesson(record as unknown as Lesson);
+        }
+      } catch (error: any) {
+        // Ignore auto-cancellation errors
+        if (!cancelled && error?.name !== 'AbortError' && error?.isAbort !== true) {
+          console.error('Lesson load error:', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    
     if (id) loadLesson(id as string);
+    
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
-
-  const loadLesson = async (lessonId: string) => {
-    try {
-      const record = await pb.collection('lessons').getOne(lessonId);
-      setLesson(record as unknown as Lesson);
-    } catch (error) {
-      console.error('Lesson load error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAnswer = (questionId: string, value: string) => {
     if (showFeedback) return; // Prevent changing after check

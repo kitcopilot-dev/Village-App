@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
+import { trackAssignmentCreate, trackAssignmentGrade } from '@/lib/analytics';
 
 export default function AssignmentsPage() {
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function AssignmentsPage() {
       const userId = pb.authStore.model?.id;
       if (!userId) return;
 
-      await pb.collection('assignments').create({
+      const newAssignment = await pb.collection('assignments').create({
         user: userId,
         child: childId,
         title,
@@ -86,6 +87,9 @@ export default function AssignmentsPage() {
         score: score ? parseFloat(score) : undefined,
         status: score ? 'Graded' : 'Pending'
       });
+
+      // Track assignment creation
+      trackAssignmentCreate(newAssignment.id, title, subject);
 
       // Log activity
       try {
@@ -115,6 +119,10 @@ export default function AssignmentsPage() {
         score: parseFloat(newScore),
         status: 'Graded'
       });
+      
+      // Track grading
+      trackAssignmentGrade(id, parseFloat(newScore));
+      
       setToast({ message: 'Score updated!', type: 'success' });
       loadData();
     } catch (error) {

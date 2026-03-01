@@ -14,6 +14,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
 import { ClientOnly } from '@/components/ui/ClientOnly';
+import { trackChildAdd, trackChildEdit } from '@/lib/analytics';
 
 export default function ManageKidsPage() {
   const router = useRouter();
@@ -31,6 +32,9 @@ export default function ManageKidsPage() {
   const [breaks, setBreaks] = useState<SchoolBreak[]>([]);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [studentInsights, setStudentInsights] = useState<any[]>([]);
+  const [kidLessons, setKidLessons] = useState<any[]>([]);
+  const [kidAttendance, setKidAttendance] = useState<any[]>([]);
+  const [kidGrades, setKidGrades] = useState<any[]>([]);
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
@@ -64,14 +68,6 @@ export default function ManageKidsPage() {
     );
   };
 
-  useEffect(() => {
-    if (!pb.authStore.isValid) {
-      router.push('/');
-      return;
-    }
-    loadKids();
-  }, []);
-
   const loadKids = async () => {
     try {
       const userId = pb.authStore.model?.id;
@@ -95,7 +91,7 @@ export default function ManageKidsPage() {
           }
         })
       );
-      
+    
       setKids(kidsWithCourses);
 
       if (schoolYear === null) {
@@ -123,6 +119,27 @@ export default function ManageKidsPage() {
     }
   };
 
+  useEffect(() => {
+    let cancelled = false;
+    
+    if (!pb.authStore.isValid) {
+      router.push('/');
+      return;
+    }
+    
+    const runLoadKids = async () => {
+      if (!cancelled) {
+        await loadKids();
+      }
+    };
+    
+    runLoadKids();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleLogout = () => {
     pb.authStore.clear();
     router.push('/');
@@ -135,8 +152,69 @@ export default function ManageKidsPage() {
         sort: '-date'
       });
       setPortfolioItems(records as unknown as PortfolioItem[]);
-    } catch (error) {
-      setPortfolioItems([]);
+    } catch (error: any) {
+      // Ignore auto-cancellation errors
+      if (error?.name !== 'AbortError' && error?.isAbort !== true) {
+        setPortfolioItems([]);
+      }
+    }
+  };
+
+  const loadKidData = async (kidId: string) => {
+    // Load lessons
+    try {
+      const lessons = await pb.collection('lessons').getFullList({
+        filter: `child = "${kidId}"`,
+        sort: '-created'
+      });
+      setKidLessons(lessons);
+    } catch (error: any) {
+      if (error?.name !== 'AbortError' && error?.isAbort !== true) {
+        console.error('Error loading lessons:', error);
+      }
+      setKidLessons([]);
+    }
+
+    // Load attendance
+    try {
+      const attendance = await pb.collection('attendance').getFullList({
+        filter: `child = "${kidId}"`,
+        sort: '-date'
+      });
+      setKidAttendance(attendance);
+    } catch (error: any) {
+      if (error?.name !== 'AbortError' && error?.isAbort !== true) {
+        console.error('Error loading attendance:', error);
+      }
+      setKidAttendance([]);
+    }
+
+    // Load grades
+    try {
+      const grades = await pb.collection('grades').getFullList({
+        filter: `child = "${kidId}"`,
+        sort: '-created'
+      });
+      setKidGrades(grades);
+    } catch (error: any) {
+      if (error?.name !== 'AbortError' && error?.isAbort !== true) {
+        console.error('Error loading grades:', error);
+      }
+      setKidGrades([]);
+    }
+
+    // Load insights
+    try {
+      const insights = await pb.collection('student_insights').getFullList({
+        filter: `child = "${kidId}"`,
+        sort: '-created'
+      });
+      setStudentInsights(insights);
+    } catch (error: any) {
+      if (error?.name !== 'AbortError' && error?.isAbort !== true) {
+        console.error('Error loading insights:', error);
+      }
+      setStudentInsights([]);
     }
   };
 
@@ -228,8 +306,10 @@ export default function ManageKidsPage() {
       };
       if (editingKid) {
         await pb.collection('children').update(editingKid.id, data);
+        trackChildEdit(editingKid.id);
       } else {
         await pb.collection('children').create(data);
+        trackChildAdd(kidName, kidGrade);
         // If this is the first child, mark profile as complete and redirect to dashboard
         if (kids.length === 0) {
           await pb.collection('profiles').update(userId, { profile_complete: true });
@@ -297,8 +377,8 @@ export default function ManageKidsPage() {
       });
       if (!response.ok) throw new Error('API call failed');
       const lessonData = await response.json();
-      const newLesson = await pb.collection('lessons').create({ user: userId, child: course.child, ...lessonData });
-      router.push(`/lessons/${newLesson.id}`);
+      await pb.collection('lessons').create({ user: userId, child: course.child, ...lessonData });
+      setToast({ message: `✨ AI Spark created for ${selectedKid?.name}! They'll see it on their dashboard.`, type: 'success' });
     } catch (e: any) {
       setToast({ message: `AI Spark failed: ${e.message}`, type: 'error' });
     } finally {
@@ -367,7 +447,7 @@ export default function ManageKidsPage() {
                       </div>
                     </div>
                     <div className="flex gap-3 mt-auto">
-                      <button onClick={() => { setSelectedKidId(kid.id); setActiveTab('overview'); loadPortfolio(kid.id); }} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-primary transition-all">📚 Vault</button>
+                      <button onClick={() => { setSelectedKidId(kid.id); setActiveTab('overview'); loadPortfolio(kid.id); loadKidData(kid.id); }} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-primary transition-all">📚 Vault</button>
                       <button onClick={() => openKidModal(kid)} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-primary transition-all">✏️ Edit</button>
                     </div>
                   </div>
@@ -391,24 +471,202 @@ export default function ManageKidsPage() {
               </div>
               {activeTab === 'overview' && (
                 <div className="space-y-6">
-                  {selectedKid?.courses?.map((course) => {
-                    const mapping = schoolYear ? getExpectedLesson(course, schoolYear, breaks) : null;
-                    return (
-                      <Card key={course.id} className="p-6">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-display font-bold m-0">{course.name}</h4>
-                            <ProgressBar label={`Lesson ${course.current_lesson} of ${course.total_lessons}`} percentage={(course.current_lesson / course.total_lessons) * 100} />
-                            <Button size="sm" variant="secondary" className="mt-4" onClick={() => generateAISpark(course)}>🤖 Get AI Spark</Button>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-display font-bold text-xl">Courses</h3>
+                    <Button size="sm" onClick={() => { setEditingCourse(null); setCourseName(''); setTotalLessons('180'); setCurrentLesson('1'); setIsCourseModalOpen(true); }}>+ Add Course</Button>
+                  </div>
+                  {selectedKid?.courses?.length === 0 ? (
+                    <Card className="p-8 text-center">
+                      <p className="text-text-muted mb-4">No courses yet.</p>
+                      <Button onClick={() => { setEditingCourse(null); setCourseName(''); setTotalLessons('180'); setCurrentLesson('1'); setIsCourseModalOpen(true); }}>Add First Course</Button>
+                    </Card>
+                  ) : (
+                    selectedKid?.courses?.map((course) => {
+                      const mapping = schoolYear ? getExpectedLesson(course, schoolYear, breaks) : null;
+                      return (
+                        <Card key={course.id} className="p-6">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-display font-bold m-0">{course.name}</h4>
+                              <ProgressBar label={`Lesson ${course.current_lesson} of ${course.total_lessons}`} percentage={(course.current_lesson / course.total_lessons) * 100} />
+                              <Button 
+                                size="sm" 
+                                variant="secondary" 
+                                className="mt-4" 
+                                onClick={() => generateAISpark(course)}
+                                disabled={sparkLoading}
+                              >
+                                {sparkLoading ? '⏳ Generating...' : '🤖 Get AI Spark'}
+                              </Button>
+                            </div>
+                            <Button size="sm" variant="outline" onClick={() => handleMarkComplete(course.id, course.current_lesson, course.total_lessons)}>Next Lesson →</Button>
                           </div>
-                          <Button size="sm" variant="outline" onClick={() => handleMarkComplete(course.id, course.current_lesson, course.total_lessons)}>Next Lesson →</Button>
-                        </div>
-                      </Card>
-                    );
-                  })}
+                        </Card>
+                      );
+                    })
+                  )}
                 </div>
               )}
-              {/* Other tabs omitted for brevity, but ensured structural integrity */}
+              {activeTab === 'schedule' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="p-4">
+                      <h4 className="font-display font-bold mb-2">📅 Lessons Completed</h4>
+                      <p className="text-3xl font-bold text-primary">{kidLessons.length}</p>
+                    </Card>
+                    <Card className="p-4">
+                      <h4 className="font-display font-bold mb-2">✅ Attendance</h4>
+                      <p className="text-3xl font-bold text-green-600">
+                        {kidAttendance.filter(a => a.status === 'present').length} / {kidAttendance.length}
+                      </p>
+                    </Card>
+                  </div>
+                  
+                  <Card className="p-4">
+                    <h4 className="font-display font-bold mb-4">Recent Lessons</h4>
+                    {kidLessons.length === 0 ? (
+                      <p className="text-text-muted">No lessons recorded yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {kidLessons.slice(0, 10).map((lesson: any) => (
+                          <div key={lesson.id} className="flex justify-between items-center p-2 bg-bg rounded">
+                            <span>{lesson.title || lesson.content?.slice(0, 50) || 'Lesson'}...</span>
+                            <span className="text-sm text-text-muted">
+                              {new Date(lesson.date || lesson.created).toLocaleDateString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+
+                  <Card className="p-4">
+                    <h4 className="font-display font-bold mb-4">Attendance History</h4>
+                    {kidAttendance.length === 0 ? (
+                      <p className="text-text-muted">No attendance recorded yet.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {kidAttendance.slice(0, 30).map((att: any) => (
+                          <span key={att.id} className={`px-2 py-1 rounded text-sm ${
+                            att.status === 'present' ? 'bg-green-100 text-green-700' :
+                            att.status === 'absent' ? 'bg-red-100 text-red-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }`}>
+                            {new Date(att.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              )}
+
+              {activeTab === 'portfolio' && (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-display font-bold text-xl">📚 Portfolio</h3>
+                    <Button size="sm" onClick={() => setIsPortfolioModalOpen(true)}>+ Add Item</Button>
+                  </div>
+                  
+                  {portfolioItems.length === 0 ? (
+                    <Card className="p-8 text-center">
+                      <p className="text-text-muted mb-4">No portfolio items yet.</p>
+                      <Button onClick={() => setIsPortfolioModalOpen(true)}>Add First Item</Button>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {portfolioItems.map((item: any) => (
+                        <Card key={item.id} className="overflow-hidden">
+                          {item.image && item.image.length > 0 && (
+                            <div className="h-40 bg-bg overflow-hidden">
+                              <img 
+                                src={`https://bear-nan.exe.xyz:8090/api/files/portfolio/${item.id}/${item.image[0]}`}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <h4 className="font-display font-bold">{item.title}</h4>
+                            <p className="text-sm text-primary">{item.subject}</p>
+                            <p className="text-sm text-text-muted mt-2">{item.description}</p>
+                            <p className="text-xs text-text-muted mt-2">
+                              {new Date(item.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'insights' && (
+                <div className="space-y-6">
+                  <h3 className="font-display font-bold text-xl">🤖 AI Insights</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="p-4">
+                      <h4 className="font-display font-bold mb-2">📚 Subjects</h4>
+                      <p className="text-2xl font-bold text-primary">
+                        {new Set(kidLessons.map((l: any) => l.subject)).size}
+                      </p>
+                    </Card>
+                    <Card className="p-4">
+                      <h4 className="font-display font-bold mb-2">📝 Assignments</h4>
+                      <p className="text-2xl font-bold text-primary">{kidGrades.length}</p>
+                    </Card>
+                    <Card className="p-4">
+                      <h4 className="font-display font-bold mb-2">📂 Work Samples</h4>
+                      <p className="text-2xl font-bold text-primary">{portfolioItems.length}</p>
+                    </Card>
+                  </div>
+
+                  {studentInsights.length > 0 ? (
+                    <div className="space-y-4">
+                      {studentInsights.map((insight: any) => (
+                        <Card key={insight.id} className="p-4 bg-gradient-to-r from-primary/5 to-primary/10">
+                          <p className="text-sm">{insight.insight}</p>
+                          <p className="text-xs text-text-muted mt-2">
+                            {new Date(insight.created).toLocaleDateString()}
+                          </p>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="p-8 text-center">
+                      <p className="text-text-muted mb-4">No AI insights generated yet.</p>
+                      <Button variant="secondary">Generate Insights</Button>
+                    </Card>
+                  )}
+
+                  <Card className="p-4">
+                    <h4 className="font-display font-bold mb-4">📊 Progress Summary</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span>Lessons Completed</span>
+                        <span className="font-bold">{kidLessons.length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Attendance Rate</span>
+                        <span className="font-bold">
+                          {kidAttendance.length > 0 
+                            ? Math.round((kidAttendance.filter(a => a.status === 'present').length / kidAttendance.length) * 100)
+                            : 0}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Portfolio Items</span>
+                        <span className="font-bold">{portfolioItems.length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Grades Recorded</span>
+                        <span className="font-bold">{kidGrades.length}</span>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
         </main>
@@ -442,6 +700,27 @@ export default function ManageKidsPage() {
           <div className="flex justify-end gap-4 mt-8">
             <Button type="button" variant="outline" onClick={() => setIsCourseModalOpen(false)}>Cancel</Button>
             <Button type="submit">Save Course</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isPortfolioModalOpen} onClose={() => setIsPortfolioModalOpen(false)} title="Add Portfolio Item">
+        <form onSubmit={handleSavePortfolio} className="space-y-4">
+          <Input placeholder="Title" value={portfolioTitle} onChange={(e) => setPortfolioTitle(e.target.value)} required />
+          <Input placeholder="Subject (e.g., Science, Math)" value={portfolioSubject} onChange={(e) => setPortfolioSubject(e.target.value)} required />
+          <Textarea placeholder="Description" value={portfolioDescription} onChange={(e) => setPortfolioDescription(e.target.value)} />
+          <div>
+            <label className="block text-sm font-medium mb-1">Image</label>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={(e) => setPortfolioFile(e.target.files?.[0] || null)}
+              className="w-full p-2 border border-border rounded"
+            />
+          </div>
+          <div className="flex justify-end gap-4 mt-8">
+            <Button type="button" variant="outline" onClick={() => setIsPortfolioModalOpen(false)}>Cancel</Button>
+            <Button type="submit">Save</Button>
           </div>
         </form>
       </Modal>

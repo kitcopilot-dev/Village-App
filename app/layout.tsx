@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Syne, Fraunces } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 
 const syneFont = Syne({
@@ -32,7 +33,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${syneFont.variable} ${plusJakartaSansFont.variable} ${frauncessFont.variable}`}>
+      <head />
       <body className="antialiased">
+        <Script
+          defer
+          data-domain="village.exe.xyz"
+          data-api="/api/event"
+          src="/js/script.js"
+          strategy="afterInteractive"
+        />
         {children}
       </body>
     </html>

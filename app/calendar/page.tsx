@@ -330,7 +330,7 @@ export default function CalendarPage() {
               <h4 className="font-display font-bold text-lg mb-3">💡 How It Works</h4>
               <ul className="space-y-2 text-sm text-text-muted">
                 <li>• <strong>School Days:</strong> Calculated as weekdays (Mon-Fri) minus scheduled breaks</li>
-                <li>• <strong>Lesson Mapping:</strong> Courses will auto-schedule based on their "Active Days" setting</li>
+                <li>• <strong>Lesson Mapping:</strong> Courses will auto-schedule based on their &ldquo;Active Days&rdquo; setting</li>
                 <li>• <strong>Progress Tracking:</strong> Dashboard will show if students are ahead or behind schedule</li>
                 <li>• <strong>Breaks:</strong> Any dates marked as breaks are excluded from lesson scheduling</li>
               </ul>

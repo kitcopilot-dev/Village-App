@@ -1,6 +1,6 @@
 import PocketBase from 'pocketbase';
 
-const PB_URL = 'https://bear-nan.exe.xyz';
+const PB_URL = 'https://bear-nan.exe.xyz:8090';
 
 // Create a singleton instance
 let pbInstance: PocketBase | null = null;

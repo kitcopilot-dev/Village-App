@@ -1,0 +1,67 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "Village." [ref=e3] [cursor=pointer]:
+      - /url: /
+      - heading "Village." [level=1] [ref=e4]
+    - navigation
+  - main [ref=e5]:
+    - generic [ref=e6]:
+      - heading "Homeschooling is Better Together." [level=1] [ref=e8]:
+        - text: Homeschooling is Better
+        - text: Together.
+      - paragraph [ref=e9]: Village is a handcrafted space for modern families to coordinate gatherings, track progress, and navigate homeschooling laws with confidence.
+      - generic [ref=e10]:
+        - button "Start Your Village" [ref=e11] [cursor=pointer]
+        - button "Student Login" [ref=e12] [cursor=pointer]
+        - button "Explore Legal Guides" [ref=e13] [cursor=pointer]
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]: 🏘️
+        - heading "Community Focused" [level=3] [ref=e17]
+        - paragraph [ref=e18]: Coordinate field trips, park days, and study groups with a local community that shares your values.
+      - generic [ref=e19]:
+        - generic [ref=e20]: ⚖️
+        - heading "Legal Clarity" [level=3] [ref=e21]
+        - paragraph [ref=e22]: Stay compliant with instant access to state-by-state homeschooling regulations and requirement checklists.
+      - generic [ref=e23]:
+        - generic [ref=e24]: 🎓
+        - heading "Academic Records" [level=3] [ref=e25]
+        - paragraph [ref=e26]: Generate professional transcripts and maintain portfolios of work samples for total academic peace of mind.
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Join the community" [level=3] [ref=e32]
+        - paragraph [ref=e33]: Create your family profile to get started.
+        - generic [ref=e34]:
+          - textbox "Email" [ref=e36]
+          - textbox "Password" [ref=e38]
+          - textbox "Confirm Password" [ref=e40]
+          - textbox "Family Name (e.g. Smith)" [ref=e42]
+          - generic [ref=e43]:
+            - generic [ref=e44]: 👨‍👩‍👧‍👦 Join Existing Family (Optional)
+            - textbox "Family Code (e.g. ABC123XYZ)" [ref=e46]
+            - paragraph [ref=e47]: If you're a co-parent or family member joining an existing family, enter their family code here.
+          - button "Create Your Account" [ref=e48] [cursor=pointer]
+      - generic [ref=e49]:
+        - heading "Already a member?" [level=3] [ref=e50]
+        - paragraph [ref=e51]: Welcome back to the village.
+        - generic [ref=e52]:
+          - textbox "Email" [ref=e54]
+          - textbox "Password" [ref=e56]
+          - button "Login" [ref=e57] [cursor=pointer]
+        - paragraph [ref=e59]:
+          - text: Not ready to join?
+          - button "View Free Legal Guides" [ref=e60] [cursor=pointer]
+    - generic [ref=e61]:
+      - generic [ref=e62]: Village.
+      - generic [ref=e63]:
+        - generic [ref=e64]: Privacy
+        - generic [ref=e65]: Terms
+        - generic [ref=e66]: Contact
+      - paragraph [ref=e67]: © 2026 Handcrafted for families.
+  - button "Open Next.js Dev Tools" [ref=e73] [cursor=pointer]:
+    - img [ref=e74]
+  - alert [ref=e77]
+```
