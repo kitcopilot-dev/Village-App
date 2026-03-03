@@ -241,3 +241,19 @@ export interface ExpenseBudget {
   created: string;
   updated: string;
 }
+
+export interface JournalEntry {
+  id: string;
+  user: string;
+  child?: string;
+  title: string;
+  content: string;
+  category: 'observation' | 'milestone' | 'struggle' | 'breakthrough' | 'reflection' | 'field_trip' | 'project' | 'resource' | 'other';
+  subject?: string;
+  mood?: 'great' | 'good' | 'neutral' | 'challenging' | 'difficult';
+  tags?: string[];
+  date: string;
+  is_private: boolean;
+  created: string;
+  updated: string;
+}

@@ -240,6 +240,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/expenses')}>
                 💰 Expenses
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/journal')}>
+                📓 Journal
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => router.push('/profile')}>← Profile</Button>
             </div>
           </div>
