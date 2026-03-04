@@ -215,3 +215,28 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface StudySession {
+  id: string;
+  user: string;
+  child?: string;
+  subject: string;
+  duration_minutes: number;
+  session_type: 'pomodoro' | 'free' | 'break';
+  completed: boolean;
+  started_at: string;
+  ended_at?: string;
+  notes?: string;
+  created: string;
+  updated: string;
+}
+
+export interface StudyGoal {
+  id: string;
+  user: string;
+  child?: string;
+  daily_minutes: number;
+  weekly_minutes: number;
+  created: string;
+  updated: string;
+}
