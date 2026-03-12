@@ -216,8 +216,14 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-0">Family Dashboard</h2>
             <div className="flex gap-3 flex-wrap">
+              <Button size="sm" onClick={() => router.push('/today')}>
+                ☀️ Today
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/attendance')}>
                 📅 Attendance
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/reading')}>
+                📚 Reading
               </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/map')}>
                 📍 Village Map
