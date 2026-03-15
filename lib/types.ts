@@ -215,3 +215,25 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface CurriculumItem {
+  id: string;
+  user: string;
+  child?: string;
+  name: string;
+  publisher?: string;
+  subject: string;
+  type: 'textbook' | 'workbook' | 'online' | 'video' | 'kit' | 'game' | 'manipulative' | 'other';
+  status: 'in_use' | 'completed' | 'planned' | 'wishlist' | 'archived';
+  cost?: number;
+  purchase_date?: string;
+  start_date?: string;
+  end_date?: string;
+  grade_level?: string;
+  rating?: number;
+  notes?: string;
+  link?: string;
+  is_favorite: boolean;
+  created: string;
+  updated: string;
+}
