@@ -234,6 +234,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/transcript')}>
                 📄 Transcript
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/year-end-summary')}>
+                📋 Year Summary
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/calendar')}>
                 🗓️ Calendar
               </Button>
