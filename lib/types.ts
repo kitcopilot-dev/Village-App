@@ -215,3 +215,20 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface ReadingEntry {
+  id: string;
+  user: string;
+  child: string;
+  book_title: string;
+  author?: string;
+  minutes_read: number;
+  pages_read?: number;
+  date: string;
+  notes?: string;
+  rating?: number; // 1-5 stars
+  finished: boolean;
+  genre?: string;
+  created: string;
+  updated: string;
+}
