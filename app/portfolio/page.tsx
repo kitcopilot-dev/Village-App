@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
+import { PortfolioShareModal } from '@/components/PortfolioShareModal';
 
 const SUBJECTS = [
   'Language Arts',
@@ -32,6 +33,7 @@ export default function PortfolioPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Form states
   const [title, setTitle] = useState('');
@@ -194,6 +196,7 @@ export default function PortfolioPage() {
           </div>
           <div className="flex gap-4">
             <Button variant="ghost" onClick={() => router.push('/dashboard')}>📊 Dashboard</Button>
+            <Button variant="outline" onClick={() => setIsShareModalOpen(true)}>🔗 Share</Button>
             <Button onClick={() => setIsModalOpen(true)}>+ Add Work Sample</Button>
           </div>
         </div>
@@ -375,6 +378,13 @@ export default function PortfolioPage() {
       )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* Share Modal */}
+      <PortfolioShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        kids={kids}
+      />
     </>
   );
 }
