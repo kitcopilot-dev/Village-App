@@ -169,7 +169,10 @@ export default function AttendancePage() {
             <h2 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight mb-2">Attendance</h2>
             <p className="text-text-muted text-sm sm:text-base font-serif italic">Tap days to log your homeschooling sessions.</p>
           </div>
-          <Button variant="ghost" onClick={() => router.push('/dashboard')}>← Dashboard</Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => router.push('/compliance')}>📊 Compliance</Button>
+            <Button variant="ghost" onClick={() => router.push('/dashboard')}>← Dashboard</Button>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 items-start">
