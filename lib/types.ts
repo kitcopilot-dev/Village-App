@@ -215,3 +215,24 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface FieldTrip {
+  id: string;
+  user: string;
+  children: string[]; // Array of child IDs who attended
+  title: string;
+  location: string;
+  date: string;
+  duration_hours?: number;
+  subjects: string[]; // Array of subjects covered
+  description: string;
+  learning_objectives?: string;
+  highlights?: string;
+  photos?: string | string[]; // URL(s) or File ID(s)
+  cost?: number;
+  latitude?: number;
+  longitude?: number;
+  is_favorite: boolean;
+  created: string;
+  updated: string;
+}
