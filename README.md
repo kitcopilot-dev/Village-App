@@ -223,3 +223,4 @@ This is a complete rewrite of the original Village Homeschool app (`village-home
 Built with ❤️ by the Village Community & Kitt
 
 © 2026 Village Homeschool
+ 
