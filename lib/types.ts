@@ -215,3 +215,27 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface HoursEntry {
+  id: string;
+  user: string;
+  child: string;
+  date: string;
+  subject: string;
+  duration_minutes: number;
+  notes?: string;
+  created: string;
+  updated: string;
+  expand?: {
+    child?: Child;
+  };
+}
+
+export interface WeeklyGoal {
+  id: string;
+  user: string;
+  child?: string;
+  target_hours: number;
+  created: string;
+  updated: string;
+}
