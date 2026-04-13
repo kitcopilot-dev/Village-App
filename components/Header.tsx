@@ -118,6 +118,26 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
             >
               Calendar
             </Link>
+            <Link 
+              href="/expenses" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/expenses' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              💰 Expenses
+            </Link>
+            <Link 
+              href="/journal" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/journal' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              📓 Journal
+            </Link>
           </>
         )}
         {showLogout && onLogout && (

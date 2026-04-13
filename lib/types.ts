@@ -215,3 +215,45 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface Expense {
+  id: string;
+  user: string;
+  child?: string;
+  amount: number;
+  category: 'curriculum' | 'supplies' | 'field_trip' | 'technology' | 'coop' | 'testing' | 'membership' | 'other';
+  vendor?: string;
+  description?: string;
+  date: string;
+  receipt_url?: string;
+  is_tax_deductible: boolean;
+  created: string;
+  updated: string;
+}
+
+export interface ExpenseBudget {
+  id: string;
+  user: string;
+  category: string;
+  monthly_limit?: number;
+  yearly_limit?: number;
+  school_year?: string;
+  created: string;
+  updated: string;
+}
+
+export interface JournalEntry {
+  id: string;
+  user: string;
+  child?: string;
+  title: string;
+  content: string;
+  category: 'observation' | 'milestone' | 'struggle' | 'breakthrough' | 'reflection' | 'field_trip' | 'project' | 'resource' | 'other';
+  subject?: string;
+  mood?: 'great' | 'good' | 'neutral' | 'challenging' | 'difficult';
+  tags?: string[];
+  date: string;
+  is_private: boolean;
+  created: string;
+  updated: string;
+}
