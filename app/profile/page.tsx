@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editChildrenAges, setEditChildrenAges] = useState('');
+  const [editFaithPreference, setEditFaithPreference] = useState<'none' | 'christian' | 'lds'>('none');
   const [message, setMessage] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
@@ -46,6 +47,7 @@ export default function ProfilePage() {
       setEditLat(prof.profile_latitude);
       setEditLon(prof.profile_longitude);
       setEditChildrenAges(prof.children_ages || '');
+      setEditFaithPreference((prof.faith_preference as 'none' | 'christian' | 'lds') || 'none');
     }
   }, [pb.authStore.isValid, router]);
 
@@ -73,7 +75,8 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges
+        children_ages: editChildrenAges,
+        faith_preference: editFaithPreference
       });
       
       // Update local state
@@ -85,7 +88,8 @@ export default function ProfilePage() {
         telegram_id: editTelegramId,
         profile_latitude: editLat,
         profile_longitude: editLon,
-        children_ages: editChildrenAges
+        children_ages: editChildrenAges,
+        faith_preference: editFaithPreference
       });
       
       setToast({ message: 'Profile updated!', type: 'success' });
@@ -270,6 +274,20 @@ export default function ProfilePage() {
                 value={editChildrenAges}
                 onChange={(e) => setEditChildrenAges(e.target.value)}
               />
+              
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-text-muted mb-2">Faith Preference</label>
+                <select
+                  value={editFaithPreference}
+                  onChange={(e) => setEditFaithPreference(e.target.value as 'none' | 'christian' | 'lds')}
+                  className="w-full px-4 py-3 bg-bg-alt border-2 border-border rounded-xl text-text-primary focus:border-primary focus:outline-none"
+                >
+                  <option value="none">None / Secular</option>
+                  <option value="christian">Christian</option>
+                  <option value="lds">LDS (Mormon)</option>
+                </select>
+                <p className="text-xs text-text-muted mt-1">Affects homeschool assignment content generation</p>
+              </div>
               
               <div className="bg-bg-alt p-6 rounded-2xl mb-8 border border-border">
                 <h4 className="font-display font-bold text-lg mb-2 text-primary">🤖 Village Assistant Bot</h4>
