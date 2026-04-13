@@ -215,3 +215,29 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface Expense {
+  id: string;
+  user: string;
+  child?: string;
+  amount: number;
+  category: 'curriculum' | 'supplies' | 'field_trip' | 'technology' | 'coop' | 'testing' | 'membership' | 'other';
+  vendor?: string;
+  description?: string;
+  date: string;
+  receipt_url?: string;
+  is_tax_deductible: boolean;
+  created: string;
+  updated: string;
+}
+
+export interface ExpenseBudget {
+  id: string;
+  user: string;
+  category: string;
+  monthly_limit?: number;
+  yearly_limit?: number;
+  school_year?: string;
+  created: string;
+  updated: string;
+}

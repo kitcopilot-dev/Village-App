@@ -31,24 +31,29 @@ export default function StudentDashboardPage() {
   const loadData = async (id: string) => {
     try {
       const [kidRecord, courseRecords, lessonRecords] = await Promise.all([
-        pb.collection('children').getOne(id),
+        pb.collection('children').getOne(id, { $cancelKey: `student-${id}` }),
         pb.collection('courses').getFullList({
           filter: `child = "${id}"`,
-          sort: 'name'
+          sort: 'name',
+          $cancelKey: `student-courses-${id}`
         }),
         pb.collection('lessons').getFullList({
           filter: `child = "${id}"`,
           sort: '-created',
-          limit: 5
+          limit: 5,
+          $cancelKey: `student-lessons-${id}`
         })
       ]);
 
       setStudent(kidRecord as unknown as Child);
       setCourses(courseRecords as unknown as Course[]);
       setLessons(lessonRecords as unknown as Lesson[]);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to load student data:', e);
-      router.push('/student');
+      // Don't redirect if it's just an abort/cancellation error
+      if (e?.name !== 'AbortError' && e?.isAbort !== true) {
+        router.push('/student');
+      }
     } finally {
       setLoading(false);
     }
