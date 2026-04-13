@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { ClientOnly } from '@/components/ui/ClientOnly';
+import { QuickActions } from '@/components/QuickActions';
 
 interface ChildWithCourses extends Child {
   courses: Course[];
@@ -493,6 +494,9 @@ export default function DashboardPage() {
           )}
         </main>
       </ClientOnly>
+      
+      {/* Floating Quick Action Button - mobile friendly */}
+      <QuickActions />
     </>
   );
 }
