@@ -215,3 +215,29 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+// Achievement & Badge Types
+export interface Achievement {
+  id: string;
+  key: string;
+  name: string;
+  description: string;
+  emoji: string;
+  category: 'learning' | 'consistency' | 'mastery' | 'milestone';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  requirement: {
+    type: 'count' | 'streak' | 'score' | 'completion';
+    metric: string;
+    value: number;
+  };
+}
+
+export interface EarnedAchievement {
+  id: string;
+  user: string;
+  child: string;
+  achievement_key: string;
+  earned_at: string;
+  created: string;
+  updated: string;
+}
