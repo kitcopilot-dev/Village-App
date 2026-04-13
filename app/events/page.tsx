@@ -34,18 +34,6 @@ export default function EventsPage() {
 
   const currentUserId = pb.authStore.model?.id;
 
-  useEffect(() => {
-    if (!pb.authStore.isValid) {
-      router.push('/');
-      return;
-    }
-    loadEvents();
-  }, []);
-
-  useEffect(() => {
-    filterEvents();
-  }, [events, searchQuery, filterAge]);
-
   const loadEvents = async () => {
     try {
       const records = await pb.collection('events').getList(1, 50, {
@@ -77,6 +65,18 @@ export default function EventsPage() {
 
     setFilteredEvents(filtered);
   };
+
+  useEffect(() => {
+    if (!pb.authStore.isValid) {
+      router.push('/');
+      return;
+    }
+    loadEvents();
+  }, []);
+
+  useEffect(() => {
+    filterEvents();
+  }, [events, searchQuery, filterAge]);
 
   const handleLogout = () => {
     pb.authStore.clear();
