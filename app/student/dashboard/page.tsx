@@ -88,7 +88,17 @@ export default function StudentDashboardPage() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* My Lessons (AI Sparks) */}
           <div className="space-y-6">
-            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary">New Missions</h3>
+            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary">Daily Reflection</h3>
+            <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 hover:border-primary transition-all group overflow-hidden relative cursor-pointer" onClick={() => router.push('/student/journal')}>
+              <div className="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-125 transition-transform">🙏</div>
+              <div className="relative z-10">
+                <h4 className="text-2xl font-display font-extrabold mb-2 text-primary">Gratitude Journal</h4>
+                <p className="text-sm text-text-muted mb-6 leading-relaxed">Take a moment to write down what you&apos;re thankful for today.</p>
+                <Button variant="outline" className="group-hover:bg-primary group-hover:text-white">Write Entry</Button>
+              </div>
+            </Card>
+
+            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary mt-12">New Missions</h3>
             {lessons.length === 0 ? (
               <Card className="p-12 text-center bg-bg-alt border-dashed">
                 <p className="text-text-muted italic">Ask your parent to generate an AI Spark for your courses!</p>
