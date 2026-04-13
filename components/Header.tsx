@@ -49,6 +49,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               Dashboard
             </Link>
             <Link 
+              href="/feed" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/feed' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              📰 Feed
+            </Link>
+            <Link 
               href="/manage-kids" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/manage-kids' 
