@@ -134,6 +134,9 @@ export default function AdminDashboardPage() {
           <Card className="p-8 bg-primary/5 border-primary/20">
             <h3 className="font-display text-2xl font-bold mb-8 text-primary border-b border-primary/10 pb-4">Admin Controls</h3>
             <div className="grid grid-cols-1 gap-4">
+              <Button variant="outline" className="justify-start gap-4 bg-white" onClick={() => router.push('/admin/memory')}>
+                <span>🧠</span> Browse Kitt&apos;s Memory
+              </Button>
               <Button variant="outline" className="justify-start gap-4 bg-white">
                 <span>📣</span> Send Community Announcement
               </Button>
