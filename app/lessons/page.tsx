@@ -29,12 +29,18 @@ const LESSONS: Lesson[] = [
   { id: 'BukDLdIRei', topic: 'Ancient Egypt', subject: 'History', grade: 'Elementary', url: 'https://how-november.exe.xyz:3002/classroom/BukDLdIRei' },
   { id: 'Yrae3zUZAA', topic: 'World War II', subject: 'History', grade: 'Middle School', url: 'https://how-november.exe.xyz:3002/classroom/Yrae3zUZAA' },
   { id: 'ohDg0tpE7r', topic: 'US Constitution', subject: 'History', grade: 'High School', url: 'https://how-november.exe.xyz:3002/classroom/ohDg0tpE7r' },
+  // Language Arts
+  { id: 'g0PbloFUWr', topic: 'Reading Comprehension', subject: 'Language Arts', grade: 'Elementary', url: 'https://how-november.exe.xyz:3002/classroom/g0PbloFUWr' },
+  { id: 'eZ7mfsVgdB', topic: 'Animals & Nature Reading', subject: 'Language Arts', grade: 'Elementary', url: 'https://how-november.exe.xyz:3002/classroom/eZ7mfsVgdB' },
+  { id: 'oJiiVxpIU1', topic: 'Essay Writing', subject: 'Language Arts', grade: 'Middle School', url: 'https://how-november.exe.xyz:3002/classroom/oJiiVxpIU1' },
+  { id: 'Bo9e6KLyu7', topic: 'Literature Analysis', subject: 'Language Arts', grade: 'High School', url: 'https://how-november.exe.xyz:3002/classroom/Bo9e6KLyu7' },
 ];
 
 const SUBJECT_ICONS: Record<string, string> = {
   'Math': '📐',
   'Science': '🔬',
   'History': '🏛️',
+  'Language Arts': '📖',
 };
 
 export default function LessonsPage() {
