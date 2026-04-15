@@ -89,6 +89,7 @@ export interface PortfolioItem {
   image: string | string[]; // URL(s) or File ID(s)
   description?: string;
   date: string;
+  is_milestone?: boolean;
   created: string;
   updated: string;
 }

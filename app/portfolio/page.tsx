@@ -39,6 +39,7 @@ export default function PortfolioPage() {
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
+  const [isMilestone, setIsMilestone] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
@@ -116,6 +117,7 @@ export default function PortfolioPage() {
       formData.append('subject', subject);
       formData.append('date', new Date(date).toISOString());
       formData.append('description', description);
+      formData.append('is_milestone', isMilestone.toString());
       
       imageFiles.forEach(file => {
         formData.append('image', file);
@@ -160,6 +162,7 @@ export default function PortfolioPage() {
     setSubject(SUBJECTS[0]);
     setDate(new Date().toISOString().split('T')[0]);
     setDescription('');
+    setIsMilestone(false);
     setImageFiles([]);
     setImagePreviews([]);
   };
@@ -234,7 +237,14 @@ export default function PortfolioPage() {
                   {subjItems.map((item) => {
                     const images = Array.isArray(item.image) ? item.image : [item.image].filter(Boolean);
                     return (
-                      <Card key={item.id} className="p-0 overflow-hidden group border-border/50 hover:border-primary/30 shadow-sm relative">
+                      <Card key={item.id} className={`p-0 overflow-hidden group border-border/50 hover:border-primary/30 shadow-sm relative ${item.is_milestone ? 'ring-2 ring-accent ring-offset-2' : ''}`}>
+                        {/* Milestone Badge */}
+                        {item.is_milestone && (
+                          <div className="absolute top-4 left-4 z-20 bg-accent text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg animate-pulse">
+                            🌟 Milestone
+                          </div>
+                        )}
+                        
                         {/* Delete Button - Moved to top right */}
                         <button 
                           onClick={() => handleDelete(item.id)} 
@@ -351,6 +361,20 @@ export default function PortfolioPage() {
           </div>
           <Textarea label="Notes (What was learned?)" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g. Learned about catalysts and exothermic reactions." />
           
+          <div className="flex items-center gap-2 py-2">
+            <input 
+              type="checkbox" 
+              id="is_milestone" 
+              checked={isMilestone} 
+              onChange={(e) => setIsMilestone(e.target.checked)}
+              className="w-4 h-4 text-accent border-border rounded focus:ring-accent"
+            />
+            <label htmlFor="is_milestone" className="text-sm font-bold text-primary flex items-center gap-1 cursor-pointer">
+              🌟 Mark as Subject Milestone
+            </label>
+            <p className="text-[10px] text-text-muted m-0 italic">(Highlights this in the transcript)</p>
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto order-2 sm:order-1">Cancel</Button>
             <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2">Add to Portfolio</Button>

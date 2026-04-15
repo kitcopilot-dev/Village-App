@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
 import { Child, Course, Assignment } from '@/lib/types';
@@ -57,7 +57,7 @@ export default function TranscriptPage() {
 
   const loadKidData = async (kidId: string) => {
     try {
-      const [courseRecords, assignmentRecords] = await Promise.all([
+      const [courseRecords, assignmentRecords, portfolioRecords] = await Promise.all([
         pb.collection('courses').getFullList({
           filter: `child = "${kidId}"`,
           sort: 'name'
@@ -65,11 +65,18 @@ export default function TranscriptPage() {
         pb.collection('assignments').getFullList({
           filter: `child = "${kidId}"`,
           sort: '-due_date'
+        }),
+        pb.collection('portfolio').getFullList({
+          filter: `child = "${kidId}" && is_milestone = true`,
+          sort: '-date'
         })
       ]);
 
       setCourses(courseRecords as unknown as Course[]);
       setAssignments(assignmentRecords as unknown as Assignment[]);
+      
+      // Inject portfolio into selectedKid temporarily for useMemo
+      setKids(prev => prev.map(k => k.id === kidId ? { ...k, expand: { portfolio: portfolioRecords } } : k));
     } catch (error) {
       console.error('Kid data load error:', error);
     }
@@ -97,6 +104,15 @@ export default function TranscriptPage() {
   };
 
   const gradedAssignments = assignments.filter(a => a.score !== undefined && a.score !== null);
+  
+  // Get milestones from portfolio
+  const milestones = useMemo(() => {
+    // Assuming portfolio items with is_milestone=true are the key academic highlights
+    // We filter these to show on the transcript as "Academic Milestones"
+    const portfolioItems = (selectedKid as any)?.expand?.portfolio || [];
+    return portfolioItems.filter((item: any) => item.is_milestone);
+  }, [selectedKid]);
+
   const overallAverage = gradedAssignments.length > 0
     ? gradedAssignments.reduce((sum, a) => sum + (a.score || 0), 0) / gradedAssignments.length
     : 0;
@@ -289,6 +305,28 @@ export default function TranscriptPage() {
                         ))}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            )}
+
+            {/* Academic Milestones */}
+            {milestones.length > 0 && (
+              <div className="mb-16">
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-6 border-b pb-2">Academic Milestones & Portfolio Highlights</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {milestones.map((item: any) => (
+                    <div key={item.id} className="p-6 bg-bg-alt/20 border-2 border-accent/10 rounded-2xl relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-3 text-2xl opacity-10 group-hover:scale-125 transition-transform">🌟</div>
+                      <p className="text-[9px] font-bold uppercase text-accent mb-1 tracking-widest">{item.subject}</p>
+                      <h4 className="font-display text-lg font-bold text-text-main mb-2 tracking-tight line-clamp-1">{item.title}</h4>
+                      {item.description && (
+                         <p className="text-xs text-text-muted italic leading-relaxed line-clamp-2">&ldquo;{item.description}&rdquo;</p>
+                      )}
+                      <p className="text-[9px] text-text-muted/60 mt-4 font-bold uppercase tracking-widest">
+                        Achieved {new Date(item.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
