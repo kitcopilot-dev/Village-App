@@ -88,15 +88,26 @@ export default function StudentDashboardPage() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* My Lessons (AI Sparks) */}
           <div className="space-y-6">
-            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary">Daily Reflection</h3>
-            <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 hover:border-primary transition-all group overflow-hidden relative cursor-pointer" onClick={() => router.push('/student/journal')}>
-              <div className="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-125 transition-transform">🙏</div>
-              <div className="relative z-10">
-                <h4 className="text-2xl font-display font-extrabold mb-2 text-primary">Gratitude Journal</h4>
-                <p className="text-sm text-text-muted mb-6 leading-relaxed">Take a moment to write down what you&apos;re thankful for today.</p>
-                <Button variant="outline" className="group-hover:bg-primary group-hover:text-white">Write Entry</Button>
-              </div>
-            </Card>
+            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary mb-8">Daily Reflection</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 hover:border-primary transition-all group overflow-hidden relative cursor-pointer" onClick={() => router.push('/student/journal')}>
+                <div className="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-125 transition-transform">🙏</div>
+                <div className="relative z-10 text-center sm:text-left">
+                  <h4 className="text-2xl font-display font-extrabold mb-2 text-primary">Journal</h4>
+                  <p className="text-xs text-text-muted mb-6 leading-relaxed">Reflect on your day.</p>
+                  <Button variant="outline" size="sm" className="group-hover:bg-primary group-hover:text-white">Write Entry</Button>
+                </div>
+              </Card>
+
+              <Card className="p-8 bg-gradient-to-br from-secondary/5 to-primary/5 border-secondary/20 hover:border-secondary transition-all group overflow-hidden relative cursor-pointer" onClick={() => router.push('/student/assignments')}>
+                <div className="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-125 transition-transform">🎯</div>
+                <div className="relative z-10 text-center sm:text-left">
+                  <h4 className="text-2xl font-display font-extrabold mb-2 text-secondary px-0">Missions</h4>
+                  <p className="text-xs text-text-muted mb-6 leading-relaxed">Check your assignments.</p>
+                  <Button variant="outline" size="sm" className="group-hover:bg-secondary group-hover:text-white">View Board</Button>
+                </div>
+              </Card>
+            </div>
 
             <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary mt-12">New Missions</h3>
             {lessons.length === 0 ? (
