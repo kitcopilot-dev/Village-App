@@ -215,3 +215,30 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface Goal {
+  id: string;
+  user: string;
+  child?: string; // Optional: family-wide goals have no child
+  title: string;
+  description?: string;
+  category: 'academic' | 'reading' | 'skill' | 'habit' | 'project' | 'other';
+  target_type: 'number' | 'completion' | 'streak';
+  target_value?: number; // For number goals (e.g., read 20 books)
+  current_value: number; // Current progress
+  unit?: string; // e.g., "books", "lessons", "hours"
+  deadline?: string; // YYYY-MM-DD
+  status: 'active' | 'completed' | 'paused' | 'archived';
+  completed_date?: string;
+  milestones?: GoalMilestone[];
+  created: string;
+  updated: string;
+}
+
+export interface GoalMilestone {
+  id: string;
+  title: string;
+  target_value: number;
+  achieved: boolean;
+  achieved_date?: string;
+}
