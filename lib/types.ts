@@ -215,3 +215,19 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface PortfolioShare {
+  id: string;
+  user: string;
+  child?: string; // Optional - if null, shares all children
+  token: string;
+  label?: string; // e.g. "For Grandma", "Evaluator 2026"
+  expires_at?: string; // Optional expiration date
+  include_grades?: boolean;
+  include_attendance?: boolean;
+  view_count: number;
+  last_viewed?: string;
+  active: boolean;
+  created: string;
+  updated: string;
+}
