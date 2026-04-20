@@ -215,3 +215,18 @@ export interface FamilyChild {
   created: string;
   updated: string;
 }
+
+export interface DailyLogEntry {
+  id: string;
+  user: string;
+  child?: string; // Optional - can log family-wide activities
+  date: string; // YYYY-MM-DD
+  subject?: string; // Math, Science, Reading, PE, Art, Music, etc.
+  activity: string; // What was done
+  notes?: string; // Additional observations/reflections
+  duration_minutes?: number; // Time spent (optional, useful for some states)
+  mood?: 'great' | 'good' | 'okay' | 'struggling'; // How it went
+  tags?: string[]; // Custom tags for filtering
+  created: string;
+  updated: string;
+}

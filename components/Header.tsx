@@ -59,6 +59,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               Manage
             </Link>
             <Link 
+              href="/daily-log" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/daily-log' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              Daily Log
+            </Link>
+            <Link 
               href="/attendance" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/attendance' 
