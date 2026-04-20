@@ -198,6 +198,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex-1 min-w-[280px] grid grid-cols-1 sm:grid-cols-2 gap-3 content-start">
+                <Button variant="secondary" onClick={() => router.push('/today')}>☀️ Today</Button>
                 <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
                 <Button variant="secondary" onClick={() => router.push('/events')}>View Events</Button>
                 <Button onClick={() => router.push('/manage-kids')}>🧒 Manage Kids</Button>
