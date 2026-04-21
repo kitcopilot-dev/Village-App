@@ -35,6 +35,8 @@ export interface Child {
   updated: string;
   courses?: Course[];
   family_code?: string;
+  pin?: string;
+  picture_pin?: string[];
 }
 
 export interface Course {

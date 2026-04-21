@@ -14,6 +14,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { Toast } from '@/components/ui/Toast';
 import { ClientOnly } from '@/components/ui/ClientOnly';
+import { PicturePinSetup } from '@/components/PicturePinSetup';
 
 export default function ManageKidsPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function ManageKidsPage() {
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [refreshCount, setRefreshCount] = useState(0);
   const [sparkLoading, setSparkLoading] = useState(false);
+  const [pinSetupKid, setPinSetupKid] = useState<Child | null>(null);
 
   // Derived state
   const selectedKid = kids.find(k => k.id === selectedKidId) || null;
@@ -280,6 +282,21 @@ export default function ManageKidsPage() {
     }
   };
 
+  const handleSavePinSetup = async (picturePin: string[], numericPin: string) => {
+    if (!pinSetupKid) return;
+    try {
+      await pb.collection('children').update(pinSetupKid.id, {
+        picture_pin: picturePin.length > 0 ? JSON.stringify(picturePin) : null,
+        pin: numericPin || pinSetupKid.pin || '1234'
+      });
+      setToast({ message: `PIN updated for ${pinSetupKid.name}!`, type: 'success' });
+      setPinSetupKid(null);
+      loadKids();
+    } catch (error) {
+      throw new Error('Failed to save PIN');
+    }
+  };
+
   const generateAISpark = async (course: Course) => {
     setSparkLoading(true);
     try {
@@ -368,6 +385,7 @@ export default function ManageKidsPage() {
                     </div>
                     <div className="flex gap-3 mt-auto">
                       <button onClick={() => { setSelectedKidId(kid.id); setActiveTab('overview'); loadPortfolio(kid.id); }} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-primary transition-all">📚 Vault</button>
+                      <button onClick={() => setPinSetupKid(kid)} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-secondary transition-all">🔐 PIN</button>
                       <button onClick={() => openKidModal(kid)} className="flex-1 h-11 rounded-xl border border-border bg-bg hover:bg-white hover:border-primary transition-all">✏️ Edit</button>
                     </div>
                   </div>
@@ -445,6 +463,20 @@ export default function ManageKidsPage() {
           </div>
         </form>
       </Modal>
+
+      {pinSetupKid && (
+        <PicturePinSetup
+          childName={pinSetupKid.name}
+          currentPicturePin={
+            typeof pinSetupKid.picture_pin === 'string' 
+              ? JSON.parse(pinSetupKid.picture_pin) 
+              : pinSetupKid.picture_pin || []
+          }
+          currentNumericPin={pinSetupKid.pin || ''}
+          onSave={handleSavePinSetup}
+          onCancel={() => setPinSetupKid(null)}
+        />
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </>
