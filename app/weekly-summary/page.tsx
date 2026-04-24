@@ -130,7 +130,7 @@ export default function WeeklySummaryPage() {
         filter: `child = "${selectedKidId}" && date >= "${startDate}" && date <= "${endDate}"`
       });
 
-      (attendanceRecords as Attendance[]).forEach((record) => {
+      (attendanceRecords as unknown as Attendance[]).forEach((record) => {
         const idx = attendanceGrid.findIndex((a) => a.date === record.date);
         if (idx !== -1) {
           attendanceGrid[idx].status = record.status;
@@ -146,7 +146,7 @@ export default function WeeklySummaryPage() {
       });
 
       const kid = (kids as Child[]).find(k => k.id === selectedKidId);
-      setAssignments((assignmentRecords as Assignment[]).map(a => ({
+      setAssignments((assignmentRecords as unknown as Assignment[]).map(a => ({
         id: a.id,
         title: a.title,
         due_date: a.due_date || '',

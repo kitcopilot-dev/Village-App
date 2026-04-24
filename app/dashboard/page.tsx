@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LoadingScreen } from '@/components/ui/Spinner';
 import { ClientOnly } from '@/components/ui/ClientOnly';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 
 interface ChildWithCourses extends Child {
   courses: Course[];
@@ -243,6 +244,8 @@ export default function DashboardPage() {
               <Button variant="ghost" size="sm" onClick={() => router.push('/profile')}>← Profile</Button>
             </div>
           </div>
+
+          <AlertBanner kids={kids} schoolYear={schoolYear} breaks={breaks} />
 
           {kids.length === 0 ? (
             <Card className="text-center py-12">
