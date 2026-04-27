@@ -3,129 +3,294 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
-import { Child, Course, Lesson } from '@/lib/types';
-import { Header } from '@/components/Header';
+import { Child, Course, Assignment, PortfolioItem } from '@/lib/types';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { LoadingScreen } from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/Button';
+
+// Kid-friendly format helpers
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return '☀️ Good morning';
+  if (hour < 17) return '🌤️ Good afternoon';
+  return '🌙 Good evening';
+}
+
+const EMOJIS: Record<string, string> = {
+  math: '🔢',
+  science: '🔬',
+  history: '📜',
+  reading: '📚',
+  writing: '✏️',
+  art: '🎨',
+  music: '🎵',
+  pe: '⚽',
+  default: '📖',
+};
+
+function getSubjectEmoji(subject: string): string {
+  const key = subject.toLowerCase();
+  return EMOJIS[key] || EMOJIS.default;
+}
 
 export default function StudentDashboardPage() {
   const router = useRouter();
   const pb = getPocketBase();
   
-  const [student, setStudent] = useState<Child | null>(null);
+  const [child, setChild] = useState<Child | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const studentId = localStorage.getItem('village_student_id');
-    if (!studentId) {
-      router.push('/student');
+    // Check for student session
+    const childId = localStorage.getItem('student_child_id');
+    const childName = localStorage.getItem('student_name');
+    
+    if (!childId) {
+      router.push('/student/login');
       return;
     }
-    loadData(studentId);
+
+    loadStudentData(childId, childName || 'Student');
   }, []);
 
-  const loadData = async (id: string) => {
+  const loadStudentData = async (childId: string, childName: string) => {
     try {
-      const [kidRecord, courseRecords, lessonRecords] = await Promise.all([
-        pb.collection('children').getOne(id),
-        pb.collection('courses').getFullList({
-          filter: `child = "${id}"`,
-          sort: 'name'
-        }),
-        pb.collection('lessons').getFullList({
-          filter: `child = "${id}"`,
-          sort: '-created',
-          limit: 5
-        })
-      ]);
+      // Get the child's profile
+      const childRecord = await pb.collection('children').getOne(childId);
+      setChild(childRecord as unknown as Child);
 
-      setStudent(kidRecord as unknown as Child);
+      // Get child's courses
+      const courseRecords = await pb.collection('courses').getFullList({
+        filter: `child = "${childId}"`,
+        sort: 'name'
+      });
       setCourses(courseRecords as unknown as Course[]);
-      setLessons(lessonRecords as unknown as Lesson[]);
+
+      // Get child's assignments
+      const assignmentRecords = await pb.collection('assignments').getFullList({
+        filter: `child = "${childId}"`,
+        sort: 'due_date'
+      });
+      setAssignments(assignmentRecords as unknown as Assignment[]);
+
+      // Get child's portfolio items
+      const portfolioRecords = await pb.collection('portfolio').getFullList({
+        filter: `child = "${childId}"`,
+        sort: '-date',
+        limit: 6
+      });
+      setPortfolioItems(portfolioRecords as unknown as PortfolioItem[]);
     } catch (e) {
       console.error('Failed to load student data:', e);
-      router.push('/student');
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('village_student_id');
-    router.push('/student');
+    localStorage.removeItem('student_child_id');
+    localStorage.removeItem('student_name');
+    router.push('/student/login');
   };
 
-  if (loading) return <LoadingScreen message="Opening your Learning Vault..." />;
-  if (!student) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">📚</div>
+          <p className="text-[#4B6344] font-medium">Loading your work...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Today's assignments
+  const today = new Date().toISOString().split('T')[0];
+  const todaysAssignments = assignments.filter(a => {
+    if (!a.due_date) return false;
+    const due = new Date(a.due_date).toISOString().split('T')[0];
+    return due === today;
+  });
+  
+  const pendingAssignments = assignments.filter(a => a.status === 'pending' || a.status === 'in_progress');
+  const completedCount = assignments.filter(a => a.status === 'completed' || a.status === 'Graded').length;
 
   return (
-    <>
-      <header className="bg-bg/80 backdrop-blur-md px-8 py-6 flex justify-between items-center sticky top-0 z-50 border-b border-border/50">
-        <h1 className="font-display text-2xl font-extrabold m-0 text-primary uppercase tracking-tighter">
-          Village<span className="text-secondary">.</span> <span className="text-text-muted text-lg lowercase font-bold tracking-normal ml-2">student</span>
-        </h1>
-        <div className="flex items-center gap-4">
-          <p className="m-0 font-bold hidden sm:block text-primary">Hi, {student.name}!</p>
-          <Button variant="outline" size="sm" onClick={handleLogout}>Log Out</Button>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto my-12 px-4 sm:px-8 pb-24 animate-fade-in">
-        <div className="mb-12">
-          <h2 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight mb-2">My Journey</h2>
-          <p className="text-text-muted text-sm sm:text-base font-serif italic">What are we exploring today?</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* My Lessons (AI Sparks) */}
-          <div className="space-y-6">
-            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-secondary">New Missions</h3>
-            {lessons.length === 0 ? (
-              <Card className="p-12 text-center bg-bg-alt border-dashed">
-                <p className="text-text-muted italic">Ask your parent to generate an AI Spark for your courses!</p>
-              </Card>
-            ) : (
-              lessons.map(lesson => (
-                <Card key={lesson.id} className="p-8 hover:border-secondary transition-all group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-secondary bg-secondary/10 px-2 py-0.5 rounded">AI Spark</span>
-                      <h4 className="text-2xl font-display font-extrabold mt-2 mb-0">{lesson.title}</h4>
-                    </div>
-                    <div className="text-3xl grayscale group-hover:grayscale-0 transition-all">✨</div>
-                  </div>
-                  <p className="text-sm text-text-muted line-clamp-2 mb-8 leading-relaxed">&ldquo;{lesson.content.hook}&rdquo;</p>
-                  <Button className="w-full" variant="secondary" onClick={() => router.push(`/lessons/${lesson.id}`)}>Start Lesson</Button>
-                </Card>
-              ))
-            )}
+    <div className="min-h-screen bg-[#FDFCF8] pb-20">
+      {/* Header */}
+      <div className="bg-[#4B6344] text-white p-4 rounded-b-3xl">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-white/80 text-sm">{getGreeting()}!</p>
+            <h1 className="font-[family-display] text-2xl">{child?.name} 👋</h1>
           </div>
+          <button
+            onClick={handleLogout}
+            className="text-white/70 hover:text-white text-sm"
+          >
+            Exit 🚪
+          </button>
+        </div>
+      </div>
 
-          {/* My Courses */}
-          <div className="space-y-6">
-            <h3 className="font-display text-xl font-bold uppercase tracking-widest text-primary">My Subjects</h3>
-            <div className="grid gap-4">
-              {courses.map(course => (
-                <Card key={course.id} className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-display font-bold m-0 text-lg">{course.name}</h4>
-                    <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">L{course.current_lesson}</span>
-                  </div>
-                  <ProgressBar 
-                    percentage={(course.current_lesson / course.total_lessons) * 100} 
-                    className="mb-0"
-                  />
-                  <p className="text-[10px] text-text-muted mt-3 uppercase font-bold tracking-widest text-center">{course.total_lessons - course.current_lesson + 1} lessons to go!</p>
-                </Card>
-              ))}
+      <div className="p-4 space-y-4">
+        {/* Progress Overview */}
+        <Card className="bg-gradient-to-r from-[#4B6344] to-[#5a7a52] text-white">
+          <h2 className="font-[family-display] text-lg mb-3">📊 My Progress</h2>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold">{courses.length}</div>
+              <div className="text-white/80 text-xs">Courses</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{completedCount}</div>
+              <div className="text-white/80 text-xs">Done</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{pendingAssignments.length}</div>
+              <div className="text-white/80 text-xs">To Do</div>
             </div>
           </div>
+        </Card>
+
+        {/* Today's Tasks */}
+        {todaysAssignments.length > 0 && (
+          <Card className="border-l-4 border-l-[#E6AF2E]">
+            <h2 className="font-[family-display] text-lg text-[#4B6344] mb-3">
+              📅 Today's Tasks
+            </h2>
+            <div className="space-y-2">
+              {todaysAssignments.map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="flex items-center gap-3 p-3 bg-[#FDFCF8] rounded-xl"
+                >
+                  <span className="text-xl">{getSubjectEmoji(assignment.subject || 'default')}</span>
+                  <div className="flex-1">
+                    <p className="font-medium text-[#333]">{assignment.title}</p>
+                    <p className="text-gray-500 text-sm">{assignment.subject}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* My Courses */}
+        <Card>
+          <h2 className="font-[family-display] text-lg text-[#4B6344] mb-3">
+            📚 My Courses
+          </h2>
+          {courses.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No courses yet!</p>
+          ) : (
+            <div className="space-y-3">
+              {courses.map((course) => {
+                const progress = course.total_lessons > 0
+                  ? Math.round((course.current_lesson / course.total_lessons) * 100)
+                  : 0;
+                
+                return (
+                  <div key={course.id} className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-[#333]">
+                        {getSubjectEmoji(course.name)} {course.name}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {course.current_lesson}/{course.total_lessons} lessons
+                      </span>
+                    </div>
+                    <ProgressBar
+                      percentage={progress}
+                      className="h-2"
+                      showPercentage={false}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+
+        {/* To Do List */}
+        {pendingAssignments.length > 0 && (
+          <Card className="border-l-4 border-l-[#D97757]">
+            <h2 className="font-[family-display] text-lg text-[#4B6344] mb-3">
+              📝 To Do List
+            </h2>
+            <div className="space-y-2">
+              {pendingAssignments.slice(0, 5).map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="flex items-center gap-3 p-3 bg-[#FDFCF8] rounded-xl"
+                >
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 rounded border-2 border-[#D97757] text-[#D97757]"
+                    readOnly
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-[#333]">{assignment.title}</p>
+                    {assignment.due_date && (
+                      <p className="text-gray-500 text-sm">
+                        Due: {formatDate(assignment.due_date)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* My Portfolio */}
+        <Card>
+          <h2 className="font-[family-display] text-lg text-[#4B6344] mb-3">
+            🎨 My Portfolio
+          </h2>
+          {portfolioItems.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">
+              No work in your portfolio yet!
+            </p>
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              {portfolioItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="aspect-square bg-gray-100 rounded-xl overflow-hidden"
+                >
+                  {item.image && typeof item.image === 'string' ? (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl">
+                      📄
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* Motivational footer */}
+        <div className="text-center py-4">
+          <p className="text-[#4B6344] font-[family-display]">
+            You're doing great! 🌟
+          </p>
         </div>
-      </main>
-    </>
+      </div>
+    </div>
   );
 }

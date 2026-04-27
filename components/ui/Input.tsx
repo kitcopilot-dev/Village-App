@@ -42,9 +42,10 @@ export function Textarea({ label, className = '', ...props }: TextareaProps) {
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
+  options?: { value: string; label: string }[];
 }
 
-export function Select({ label, className = '', children, ...props }: SelectProps) {
+export function Select({ label, className = '', children, options, ...props }: SelectProps) {
   return (
     <div className="mb-3 sm:mb-5">
       {label && (
@@ -62,7 +63,10 @@ export function Select({ label, className = '', children, ...props }: SelectProp
         `}
         {...props}
       >
-        {children}
+        {options 
+          ? options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)
+          : children
+        }
       </select>
     </div>
   );
