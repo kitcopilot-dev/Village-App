@@ -135,7 +135,12 @@ export default function TranscriptPage() {
               <h2 className="font-display text-4xl sm:text-6xl font-extrabold tracking-tight mb-2">Transcript</h2>
               <p className="text-text-muted text-sm sm:text-base">Generate an official academic record for your records.</p>
             </div>
-            <Button variant="ghost" onClick={() => router.push('/dashboard')}>← Dashboard</Button>
+            <div className="flex gap-3">
+              <Button variant="outline" size="sm" onClick={() => router.push('/transcript/enhanced')}>
+                📜 Enhanced →
+              </Button>
+              <Button variant="ghost" onClick={() => router.push('/dashboard')}>← Dashboard</Button>
+            </div>
           </div>
 
           <Card className="p-6 md:p-8">
