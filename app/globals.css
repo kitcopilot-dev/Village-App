@@ -138,3 +138,26 @@ input[type="date"] {
 input, select, textarea {
   max-width: 100%;
 }
+
+/* V2 navigation shell: only activates on authenticated pages that render Header(showLogout). */
+@media (min-width: 1024px) {
+  body:has(.village-app-shell) {
+    padding-left: 20rem;
+  }
+
+  body:has(.village-app-shell.nav-collapsed) {
+    padding-left: 6rem;
+  }
+
+  body:has(.village-app-shell) main,
+  body:has(.village-app-shell) .page,
+  body:has(.village-app-shell) > div:not(.village-app-shell) {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  body:has(.village-app-shell) {
+    padding-left: 0;
+  }
+}
