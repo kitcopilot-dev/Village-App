@@ -139,6 +139,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               📊 Reports
             </Link>
             <Link 
+              href="/records-checkup" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/records-checkup' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              ✅ Checkup
+            </Link>
+            <Link 
               href="/lessons" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/lessons' 
