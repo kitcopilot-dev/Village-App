@@ -39,6 +39,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               </Link>
             )}
             <Link 
+              href="/today" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/today' 
+                  ? 'bg-secondary/10 text-secondary' 
+                  : 'text-secondary hover:text-secondary-dark hover:bg-secondary/10'
+              }`}
+            >
+              ☀️ Today
+            </Link>
+            <Link 
               href="/dashboard" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/dashboard' 
