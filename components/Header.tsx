@@ -89,6 +89,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               Assignments
             </Link>
             <Link 
+              href="/review-queue" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/review-queue' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              Review
+            </Link>
+            <Link 
               href="/portfolio" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/portfolio' 
