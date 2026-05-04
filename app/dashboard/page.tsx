@@ -225,6 +225,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/assignments')}>
                 📝 Assignments
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/review-queue')}>
+                ✅ Review Queue
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/events')}>
                 🎉 Events
               </Button>
