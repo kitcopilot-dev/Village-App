@@ -33,6 +33,7 @@ const NAV_GROUPS: NavGroup[] = [
     icon: '⌂',
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: '⌂', description: 'Today, alerts, quick actions' },
+      { href: '/morning-plan', label: 'Morning Plan', icon: '☀', description: 'Daily launch sheet' },
       { href: '/calendar', label: 'Calendar', icon: '◷', description: 'Plans and schedule' },
       { href: '/events', label: 'Events', icon: '◇', description: 'Community meetups' },
       { href: '/map', label: 'Map', icon: '◎', description: 'Families and places' },
