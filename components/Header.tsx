@@ -99,6 +99,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
               Portfolio
             </Link>
             <Link 
+              href="/portfolio-pack" 
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/portfolio-pack' 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              Pack
+            </Link>
+            <Link 
               href="/weekly-summary" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                 pathname === '/weekly-summary' 
