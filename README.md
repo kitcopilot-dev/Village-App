@@ -110,6 +110,24 @@ npm run build
 npm start
 ```
 
+### PR Radar
+
+Use the local PR Radar when you want a fast merge-session brief for the Village GitHub queue:
+
+```bash
+npm run pr:radar
+```
+
+It scans open pull requests with the GitHub CLI, ranks clean merge candidates, flags stale/blocked work, and writes a local `pr-radar.md` report. Generated reports are gitignored.
+
+Useful options:
+
+```bash
+npm run pr:radar -- --limit 100
+npm run pr:radar -- --repo kitcopilot-dev/Village-App --out /tmp/village-pr-radar.md
+npm run pr:radar -- --no-write
+```
+
 ## 📁 Project Structure
 
 ```
