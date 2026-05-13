@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
+import { clearLegacyAuth, getCurrentProfileId } from '@/lib/auth';
 import { Assignment, Attendance, Child, Course, SchoolBreak, SchoolYear } from '@/lib/types';
 import { getExpectedLesson, LessonMapping } from '@/lib/calendar-utils';
 import { Header } from '@/components/Header';
@@ -90,8 +91,12 @@ export default function TodayPage() {
     setMessage('');
 
     try {
-      const userId = pb.authStore.model?.id;
-      if (!userId) return;
+      const userId = getCurrentProfileId(pb);
+      if (!userId) {
+        clearLegacyAuth(pb);
+        router.push('/');
+        return;
+      }
 
       const [childRecords, assignmentRecords, attendanceRecords, yearRecords] = await Promise.all([
         pb.collection('children').getFullList({
@@ -179,10 +184,11 @@ export default function TodayPage() {
     } finally {
       setLoading(false);
     }
-  }, [dayName, pb, todayKey]);
+  }, [dayName, pb, router, todayKey]);
 
   useEffect(() => {
-    if (!pb.authStore.isValid) {
+    if (!pb.authStore.isValid || !getCurrentProfileId(pb)) {
+      clearLegacyAuth(pb);
       router.push('/');
       return;
     }
@@ -194,8 +200,12 @@ export default function TodayPage() {
     try {
       setSavingAttendance(true);
       setMessage('');
-      const userId = pb.authStore.model?.id;
-      if (!userId) return;
+      const userId = getCurrentProfileId(pb);
+      if (!userId) {
+        clearLegacyAuth(pb);
+        router.push('/');
+        return;
+      }
 
       const updates = await Promise.all(kids.map(async (kid) => {
         const existing = attendanceByChildId[kid.id];
