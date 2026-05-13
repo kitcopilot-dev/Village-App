@@ -59,6 +59,11 @@ test.describe('Village Homeschool - Smoke Tests', () => {
       await expect(page).toHaveURL('/');
     });
 
+    test('today pack redirects to login when not authenticated', async ({ page }) => {
+      await page.goto('/today');
+      await expect(page).toHaveURL('/');
+    });
+
     test('assignments redirects to login when not authenticated', async ({ page }) => {
       await page.goto('/assignments');
       await expect(page).toHaveURL('/');

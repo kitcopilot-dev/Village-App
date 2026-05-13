@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPocketBase } from '@/lib/pocketbase';
+import { clearLegacyAuth, isProfileAuth } from '@/lib/auth';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -29,7 +30,9 @@ export default function Home() {
     setPb(pocketbase);
     
     // Check if already logged in
-    if (pocketbase.authStore.isValid) {
+    clearLegacyAuth(pocketbase);
+
+    if (pocketbase.authStore.isValid && isProfileAuth(pocketbase)) {
       const profile = pocketbase.authStore.model as any;
       if (profile?.profile_complete) {
         router.push('/dashboard');
