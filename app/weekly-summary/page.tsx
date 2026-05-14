@@ -66,7 +66,7 @@ export default function WeeklySummaryPage() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [selectedChild, setSelectedChild] = useState<string>('all');
+  const [copyMessage, setCopyMessage] = useState('');
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
@@ -130,7 +130,7 @@ export default function WeeklySummaryPage() {
         filter: `child = "${selectedKidId}" && date >= "${startDate}" && date <= "${endDate}"`
       });
 
-      (attendanceRecords as Attendance[]).forEach((record) => {
+      (attendanceRecords as unknown as Attendance[]).forEach((record) => {
         const idx = attendanceGrid.findIndex((a) => a.date === record.date);
         if (idx !== -1) {
           attendanceGrid[idx].status = record.status;
@@ -146,7 +146,7 @@ export default function WeeklySummaryPage() {
       });
 
       const kid = (kids as Child[]).find(k => k.id === selectedKidId);
-      setAssignments((assignmentRecords as Assignment[]).map(a => ({
+      setAssignments((assignmentRecords as unknown as Assignment[]).map(a => ({
         id: a.id,
         title: a.title,
         due_date: a.due_date || '',
@@ -255,6 +255,83 @@ export default function WeeklySummaryPage() {
     return date === formatDate(new Date());
   };
 
+  const selectedKid = kids.find(kid => kid.id === selectedKidId);
+  const attendanceCounts = attendance.reduce<Record<NonNullable<Attendance['status']>, number>>((counts, day) => {
+    if (day.status) {
+      counts[day.status] += 1;
+    }
+    return counts;
+  }, {
+    present: 0,
+    absent: 0,
+    'half-day': 0,
+    sick: 0,
+    holiday: 0
+  });
+  const markedAttendanceDays = attendance.filter(day => day.status).length;
+  const presentEquivalentDays = attendanceCounts.present + (attendanceCounts['half-day'] * 0.5);
+  const completedAssignments = assignments.filter(assignment =>
+    assignment.status === 'completed' || assignment.status === 'Graded'
+  ).length;
+
+  const buildWeeklyRecordText = (): string => {
+    const attendanceLines = attendance.map(day =>
+      `- ${day.displayDate}: ${day.status ? getStatusLabel(day.status).replace(/^[^A-Za-z]+\s*/, '') : 'Unmarked'}`
+    );
+
+    const assignmentLines = assignments.length > 0
+      ? assignments.map(assignment => `- ${assignment.title} (${assignment.status}; due ${assignment.due_date || 'no date'})`)
+      : ['- No assignments due this week'];
+
+    const portfolioLines = portfolioItems.length > 0
+      ? portfolioItems.map(item => `- ${item.title}${item.subject ? ` — ${item.subject}` : ''}`)
+      : ['- No portfolio items added this week'];
+
+    return [
+      'Village Weekly Record',
+      `Student: ${selectedKid?.name || 'Selected child'}`,
+      `Week: ${formatWeekRange()}`,
+      '',
+      'Attendance',
+      `- Marked days: ${markedAttendanceDays}/7`,
+      `- Present-equivalent days: ${presentEquivalentDays}/7`,
+      `- Present: ${attendanceCounts.present} | Half days: ${attendanceCounts['half-day']} | Sick: ${attendanceCounts.sick} | Holidays: ${attendanceCounts.holiday} | Absent: ${attendanceCounts.absent}`,
+      ...attendanceLines,
+      '',
+      'Assignments',
+      `- Completed/graded: ${completedAssignments}/${assignments.length}`,
+      ...assignmentLines,
+      '',
+      'Portfolio',
+      `- Items captured: ${portfolioItems.length}`,
+      ...portfolioLines
+    ].join('\n');
+  };
+
+  const copyWeeklyRecord = async () => {
+    const text = buildWeeklyRecordText();
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopyMessage('Copied weekly record summary.');
+    } catch (error) {
+      console.error('Copy weekly record error:', error);
+      setCopyMessage('Could not copy automatically. Use Print / Save PDF instead.');
+    }
+  };
+
   if (loading && kids.length > 0) {
     return (
       <div className="min-h-screen bg-creamy">
@@ -274,7 +351,7 @@ export default function WeeklySummaryPage() {
             Weekly Summary
           </h1>
           <p className="text-stone-600">
-            Track attendance and view the week's assignments
+            Track attendance and view the week&apos;s assignments
           </p>
         </div>
 
@@ -285,16 +362,14 @@ export default function WeeklySummaryPage() {
               label="Select Child"
               value={selectedKidId}
               onChange={(e) => setSelectedKidId(e.target.value)}
-              options={[
-                { value: '', label: 'All Children' },
-                ...kids.map(k => ({ value: k.id, label: k.name }))
-              ]}
-            />
+            >
+              {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+            </Select>
           </div>
         )}
 
         {/* Week Navigation */}
-        <Card className="mb-6">
+        <Card className="mb-6 print:hidden">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -325,8 +400,58 @@ export default function WeeklySummaryPage() {
           </div>
         </Card>
 
+        {/* Parent Record Export */}
+        <Card className="mb-6 border-primary/20 bg-white print:border-stone-300 print:shadow-none">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-2">
+                Parent record export
+              </p>
+              <h3 className="text-xl font-display font-bold text-primary mb-2">
+                {selectedKid?.name || 'Student'} • {formatWeekRange()}
+              </h3>
+              <p className="text-sm text-stone-600 max-w-2xl">
+                Copy this into a text, email, evaluator note, or print it to PDF for your homeschool records.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 print:hidden">
+              <Button variant="secondary" size="sm" onClick={copyWeeklyRecord}>
+                Copy summary
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.print()}>
+                Print / Save PDF
+              </Button>
+            </div>
+          </div>
+
+          {copyMessage && (
+            <div className="mt-4 rounded-lg bg-primary/10 px-4 py-2 text-sm font-semibold text-primary print:hidden">
+              {copyMessage}
+            </div>
+          )}
+
+          <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="rounded-xl bg-stone-50 p-3">
+              <p className="text-xs uppercase tracking-wide text-stone-500">Marked days</p>
+              <p className="text-2xl font-bold text-primary">{markedAttendanceDays}/7</p>
+            </div>
+            <div className="rounded-xl bg-stone-50 p-3">
+              <p className="text-xs uppercase tracking-wide text-stone-500">Present equiv.</p>
+              <p className="text-2xl font-bold text-primary">{presentEquivalentDays}</p>
+            </div>
+            <div className="rounded-xl bg-stone-50 p-3">
+              <p className="text-xs uppercase tracking-wide text-stone-500">Assignments done</p>
+              <p className="text-2xl font-bold text-primary">{completedAssignments}/{assignments.length}</p>
+            </div>
+            <div className="rounded-xl bg-stone-50 p-3">
+              <p className="text-xs uppercase tracking-wide text-stone-500">Portfolio items</p>
+              <p className="text-2xl font-bold text-primary">{portfolioItems.length}</p>
+            </div>
+          </div>
+        </Card>
+
         {/* Attendance Grid */}
-        <Card className="mb-6">
+        <Card className="mb-6 print:shadow-none">
           <h3 className="text-lg font-semibold text-primary mb-4">
             📅 Attendance
           </h3>
