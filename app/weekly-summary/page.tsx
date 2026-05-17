@@ -66,7 +66,6 @@ export default function WeeklySummaryPage() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [selectedChild, setSelectedChild] = useState<string>('all');
 
   useEffect(() => {
     if (!pb.authStore.isValid) {
@@ -130,8 +129,8 @@ export default function WeeklySummaryPage() {
         filter: `child = "${selectedKidId}" && date >= "${startDate}" && date <= "${endDate}"`
       });
 
-      (attendanceRecords as Attendance[]).forEach((record) => {
-        const idx = attendanceGrid.findIndex((a) => a.date === record.date);
+      (attendanceRecords as unknown as Attendance[]).forEach((record) => {
+        const idx = attendanceGrid.findIndex((a) => a.date === record.date.slice(0, 10));
         if (idx !== -1) {
           attendanceGrid[idx].status = record.status;
         }
@@ -145,8 +144,8 @@ export default function WeeklySummaryPage() {
         sort: 'due_date'
       });
 
-      const kid = (kids as Child[]).find(k => k.id === selectedKidId);
-      setAssignments((assignmentRecords as Assignment[]).map(a => ({
+      const kid = kids.find(k => k.id === selectedKidId);
+      setAssignments((assignmentRecords as unknown as Assignment[]).map(a => ({
         id: a.id,
         title: a.title,
         due_date: a.due_date || '',
@@ -274,7 +273,7 @@ export default function WeeklySummaryPage() {
             Weekly Summary
           </h1>
           <p className="text-stone-600">
-            Track attendance and view the week's assignments
+            Track attendance and view this week&apos;s assignments
           </p>
         </div>
 
@@ -285,11 +284,9 @@ export default function WeeklySummaryPage() {
               label="Select Child"
               value={selectedKidId}
               onChange={(e) => setSelectedKidId(e.target.value)}
-              options={[
-                { value: '', label: 'All Children' },
-                ...kids.map(k => ({ value: k.id, label: k.name }))
-              ]}
-            />
+            >
+              {kids.map(k => <option key={k.id} value={k.id}>{k.name}</option>)}
+            </Select>
           </div>
         )}
 

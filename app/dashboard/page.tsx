@@ -231,6 +231,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/portfolio')}>
                 🎨 Portfolio
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/records')}>
+                🗂️ Records Packet
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/transcript')}>
                 📄 Transcript
               </Button>
