@@ -138,6 +138,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
             >
               📊 Reports
             </Link>
+            <Link
+              href="/esa-readiness"
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/esa-readiness'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              ESA
+            </Link>
             <Link 
               href="/lessons" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
