@@ -68,6 +68,16 @@ export function Header({ onLogout, showLogout = false }: HeaderProps) {
             >
               Attendance
             </Link>
+            <Link
+              href="/daily-closeout"
+              className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
+                pathname === '/daily-closeout'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-text-muted hover:text-text hover:bg-bg-alt'
+              }`}
+            >
+              Closeout
+            </Link>
             <Link 
               href="/map" 
               className={`hidden md:inline-block px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${

@@ -219,6 +219,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/attendance')}>
                 📅 Attendance
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/daily-closeout')}>
+                Daily Closeout
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/map')}>
                 📍 Village Map
               </Button>
