@@ -237,6 +237,9 @@ export default function DashboardPage() {
               <Button variant="outline" size="sm" onClick={() => router.push('/calendar')}>
                 🗓️ Calendar
               </Button>
+              <Button variant="outline" size="sm" onClick={() => router.push('/parent-metrics')}>
+                📈 Parent Metrics
+              </Button>
               <Button variant="outline" size="sm" onClick={() => router.push('/reports')}>
                 📊 Reports
               </Button>
