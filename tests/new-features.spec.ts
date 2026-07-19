@@ -13,7 +13,7 @@ test.describe('Village Homeschool - New Features (Mocked Backend)', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           token: fakeToken,
-          record: { id: 'user-1', email: 'test@example.com', family_name: 'Lynch Family', location: 'Chicago, IL', profile_latitude: 41.8781, profile_longitude: -87.6298 }
+          record: { id: 'user-1', email: 'test@example.com', family_name: 'Lynch Family', location: 'Chicago, IL', profile_latitude: 41.8781, profile_longitude: -87.6298, profile_complete: true }
         })
       });
     });
@@ -24,7 +24,7 @@ test.describe('Village Homeschool - New Features (Mocked Backend)', () => {
         contentType: 'application/json',
         body: JSON.stringify({
           token: fakeToken,
-          record: { id: 'user-1', email: 'test@example.com', family_name: 'Lynch Family', location: 'Chicago, IL', profile_latitude: 41.8781, profile_longitude: -87.6298 }
+          record: { id: 'user-1', email: 'test@example.com', family_name: 'Lynch Family', location: 'Chicago, IL', profile_latitude: 41.8781, profile_longitude: -87.6298, profile_complete: true }
         })
       });
     });
@@ -38,6 +38,8 @@ test.describe('Village Homeschool - New Features (Mocked Backend)', () => {
         await route.fulfill({ status: 200, body: JSON.stringify({ items: [{ id: 'course-1', child: 'kid-1', name: 'Science', total_lessons: 180, current_lesson: 5, active_days: 'Tue,Thu' }] }) });
       } else if (url.includes('attendance')) {
         await route.fulfill({ status: 200, body: JSON.stringify({ items: [{ id: 'att-1', child: 'kid-1', date: new Date().toISOString(), status: 'present' }] }) });
+      } else if (url.includes('assignments')) {
+        await route.fulfill({ status: 200, body: JSON.stringify({ items: [{ id: 'assign-1', child: 'kid-1', title: 'Solar System Report', subject: 'Science', due_date: new Date().toISOString(), status: 'completed', score: 94, created: new Date().toISOString(), updated: new Date().toISOString() }] }) });
       } else if (url.includes('portfolio')) {
         await route.fulfill({ status: 200, body: JSON.stringify({ items: [{ id: 'p-1', child: 'kid-1', title: 'Solar Project', subject: 'Science', date: new Date().toISOString() }] }) });
       } else if (url.includes('lessons')) {
@@ -62,7 +64,7 @@ test.describe('Village Homeschool - New Features (Mocked Backend)', () => {
     await loginForm.getByPlaceholder('Email').fill('test@example.com');
     await loginForm.getByPlaceholder('Password').fill('password123');
     await loginForm.locator('button:has-text("Login")').click();
-    await expect(page).toHaveURL('/profile');
+    await expect(page).toHaveURL('/dashboard');
   });
 
   test('attendance tracker - tap to log', async ({ page }) => {
@@ -107,6 +109,17 @@ test.describe('Village Homeschool - New Features (Mocked Backend)', () => {
     
     // Verify card content
     await expect(page.locator('h4:has-text("Solar Project")')).toBeVisible();
+  });
+
+  test('ESA packet assembles reimbursement-ready records', async ({ page }) => {
+    await page.getByRole('button', { name: /ESA Packet/ }).click();
+    await expect(page).toHaveURL('/esa-packet');
+
+    await expect(page.getByRole('heading', { name: 'ESA Documentation Packet' }).first()).toBeVisible();
+    await expect(page.locator('text=Tulip Lynch')).toBeVisible();
+    await expect(page.locator('text=Solar System Report')).toBeVisible();
+    await expect(page.locator('text=Solar Project')).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Educational software' })).toBeVisible();
   });
 
   test('AI Lesson Spark and Player flow', async ({ page }) => {
